@@ -10,8 +10,9 @@ from tika import parser
 from os.path import exists
 import filecmp
 
-from models import Course, Class, db, Schedule, Instructor, CourseAttribute
+from models import Course, Class, ClassSchedule, Instructor, CourseAttribute
 from utilities import search_to_schedule, get_or_create_instructor, safe_cast
+from database import db_session
 
 
 def get_root_text(html_element):
@@ -45,72 +46,14 @@ subjects = (
     "WOLO", "WGST", "VIET")
 
 
-def get_unc_course_data():
-    for subject in tqdm(subjects, position=0, leave=False, desc="subjects"):
-        subject_response = None
-        while subject_response is None:
-            try:
-                subject_response = requests.post("https://catalog.unc.edu/course-search/api/index.cgi",
-                                                 params={
-                                                     "page": "fose",
-                                                     "route": "search",
-                                                     "keyword": subject
-                                                 },
-                                                 json={
-                                                     "other": {"srcdb": ""},
-                                                     "criteria": [
-                                                         {"field": "keyword",
-                                                          "value": subject}
-                                                     ]
-                                                 })
-            except (ConnectionError, TimeoutError, NewConnectionError, MaxRetryError) as e:
-                subject_response = None
-                print(e)
-
-        for course in tqdm(subject_response.json()["results"], position=1, leave=False, desc=subject):
-            if db.session.query(Course.catalog_number).filter_by(catalog_number=course["key"],
-                                                                 srcdb=course["srcdb"]).first() is None:
-                course_response = None
-                while course_response is None:
-                    try:
-                        course_response = requests.post("https://catalog.unc.edu/course-search/api/index.cgi",
-                                                        params={
-                                                            "page": "fose",
-                                                            "route": "details"
-                                                        },
-                                                        json={
-                                                            "group": f"key:{course['key']}",
-                                                            "key": f"key:{course['key']}",
-                                                            "srcdb": course["srcdb"],
-                                                            "matched": f"key:{course['key']}"
-                                                        })
-                    except (ConnectionError, TimeoutError, NewConnectionError, MaxRetryError) as e:
-                        course_response = None
-                        print(e)
-
-                course_data = course_response.json()
-
-                if db.session.query(Course.code).filter_by(code=course_data["code"]).first() is None:
-                    db.session.add(Course(
-                        code=course_data["code"],
-                        catalog_number=course_data["key"],
-                        title=course_data["title"],
-                        hours=course_data["hours"],
-                        description=course_data["description"],
-                        honorsdescription=course_data["honorsdesc"],
-                        attrs=course_data["attrs"],
-                        srcdb=course["srcdb"]
-                    ))
-
-
-def get_sections_data(terms):
+def process_course_search_for_terms(terms):
     for term in terms:
-        get_sections_data_for_term(term)
+        process_course_search_for_term(term)
 
 
 # gets information about classes from the class search
 # (will not get information about any class without credit hours)
-def get_sections_data_for_term(term):
+def process_course_search_for_term(term):
     response = requests.get("https://reports.unc.edu/class-search/advanced_search/", params={
         "term": term,
         "advanced": ", ".join(subjects)
@@ -121,6 +64,7 @@ def get_sections_data_for_term(term):
 
     print("got a response")
     soup = BeautifulSoup(str(response.content).replace("\\n", ""), "html.parser")
+    timestamp = datetime.datetime.utcnow()
 
     rows = soup.select("#results-table > tbody > tr")
     static_class_data = {}
@@ -136,25 +80,29 @@ def get_sections_data_for_term(term):
 
         # check to see if the course exists, if not leave a warning
         course_id = static_class_data["subject"] + " " + static_class_data["catalog number"]
-        if db.session.query(Course.code).filter_by(code=course_id).first() is None:
+        if db_session.query(Course.code).filter_by(code=course_id).first() is None and course_id not in missing_courses:
             missing_courses.append(course_id)
-            db.session.add(Course(
+            db_session.add(Course(
                 code=course_id,
                 title=class_data["course description"],
                 description="Generated from section data",
-                credits=class_data["credit hours"]
+                credits=class_data["credit hours"],
+                last_updated_at=timestamp,
+                last_updated_from="search"
             ))
 
         class_number = safe_cast(class_data["class number"], int, -1)
 
-        class_obj = db.session.query(Class).filter_by(class_number=class_number, term=term).first()
+        class_obj = db_session.query(Class).filter_by(class_number=class_number, term=term).first()
         if class_obj is None:
+            if str(class_number) in missing_classes:
+                continue
             missing_classes.append(str(class_number))
 
             schedule = search_to_schedule(class_data, term)
-            db.session.add(schedule)
+            db_session.add(schedule)
 
-            db.session.add(Class(
+            db_session.add(Class(
                 course_id=course_id,
                 class_section=class_data["section number"],
                 class_number=class_number,
@@ -164,10 +112,12 @@ def get_sections_data_for_term(term):
                 meeting_dates=class_data["meeting dates"],
                 instruction_type=class_data["instruction mode"],
                 schedules=[schedule],
-                enrollment_total=-1 * safe_cast(class_data["available seats"], int, -1)
+                enrollment_total=-1 * safe_cast(class_data["available seats"], int, -1),
+                last_updated_at=timestamp,
+                last_updated_from="search"
             ))
         else:
-            # add/updater the meeting dates since this isnt available in the pdf
+            # add/update the meeting dates since this isnt available in the pdf
             class_obj.meeting_dates = class_data["meeting dates"]
             # add/update the instruction type since this isn't scraped from the pdf
             class_obj.instruction_type = class_data["instruction mode"]
@@ -192,11 +142,15 @@ def get_sections_data_for_term(term):
                 (0 if class_obj.enrollment_cap is None else class_obj.enrollment_cap) \
                 - safe_cast(class_data["available seats"], int, -1)
 
+            # update last updated info
+            class_obj.last_updated_at = timestamp
+            class_obj.last_updated_from = "search"
+
     print(f"Created entries for {len(missing_courses)} missing courses: " + ",".join(missing_courses))
     print(f"Created entries for {len(missing_classes)} missing classes: " + ",".join(missing_classes))
 
 
-def pdf_data(terms):
+def process_pdf_for_terms(terms):
     print("Getting most up to date pdf")
 
     response = requests.get("https://registrar.unc.edu/courses/schedule-of-classes/directory-of-classes-2/")
@@ -220,22 +174,21 @@ def pdf_data(terms):
 
             if not exists(filename) or not filecmp.cmp(filename, temp_filename):
                 print("File changed, analysing new PDF")
-                print(f"Deleted {db.session.query(Class).filter_by(term=term).delete()} classes from term {term}")
-                print(f"Deleted {db.session.query(Schedule).filter_by(term=term).delete()} schedules from term {term}")
                 if exists(filename):
                     os.remove(filename)
                 os.rename(temp_filename, filename)
-                get_data_from_pdf(filename)
+                process_pdf(filename)
             else:
                 print(f"File unchanged")
                 os.remove(temp_filename)
 
 
-def get_data_from_pdf(file_name):
+def process_pdf(file_name):
     print(f"Processing {file_name}")
 
     missing_courses = []
 
+    timestamp = datetime.datetime.utcnow()
     term = file_name.split("/")[1].split(".")[0]
     raw = parser.from_file(file_name)
     class_data = {}
@@ -246,58 +199,115 @@ def get_data_from_pdf(file_name):
             if len(class_data) > 0:
                 course_id = class_data["dept"] + " " + class_data["catalog_number"]
                 # check to see if the course exists, if not leave a warning
-                if db.session.query(Course.code).filter_by(code=course_id).first() is None:
+                if db_session.query(Course.code).filter_by(
+                        code=course_id).first() is None and course_id not in missing_courses:
                     missing_courses.append(course_id)
-                    db.session.add(Course(
+                    db_session.add(Course(
                         code=course_id,
                         title=class_data["title"],
                         credits=class_data["units"],
-                        last_updated=datetime.datetime.utcnow()
+                        last_updated_at=timestamp,
+                        last_updated_from="pdf"
                     ))
 
-                schedules = []
-                for schedule_data in class_data["schedules"]:
-                    instructors = []
-                    for instructor_data in schedule_data["instructors"]:
-                        instructor = db.session.query(Instructor).filter_by(name=instructor_data["name"]).first()
-                        if instructor is None:
-                            instructor = Instructor(
-                                name=instructor_data["name"],
-                                instructor_type=instructor_data["type"]
-                            )
-                        instructors.append(instructor)
-                    db.session.add_all(instructors)
-                    schedule = Schedule(
-                        location=schedule_data["building"] + " " + schedule_data["room"],
-                        instructors=instructors,
-                        days=schedule_data["days"],
-                        time=schedule_data["time"],
-                        term=term
-                    )
-                    schedules.append(schedule)
-                db.session.add_all(schedules)
+                class_obj = db_session.query(Class).filter_by(class_number=class_data["class_number"],
+                                                              term=term).first()
 
-                db.session.add(Class(
-                    course_id=course_id,
-                    class_section=class_data["section"],
-                    class_number=class_data["class_number"],
-                    title=class_data["title"],
-                    component=class_data["component"],
-                    topics=class_data["topics"],
-                    term=term,
-                    hours=class_data["units"],
-                    # meeting dates, instruction type not provided
-                    schedules=schedules,
-                    enrollment_cap=class_data["enrollment_cap"],
-                    enrollment_total=class_data["enrollment_total"],
-                    waitlist_cap=class_data["waitlist_cap"],
-                    waitlist_total=class_data["waitlist_total"],
-                    min_enrollment=class_data["min_enrollment"],
-                    attributes=class_data["attributes"] if "attributes" in class_data else "",
-                    combined_section_id=class_data[
-                        "combined_section_id"] if "combined_section_id" in class_data else "",
-                    equivalents=class_data["equivalents"] if "equivalents" in class_data else ""
-                ))
+                if class_obj is None:
+                    # if the class doesn't exist yet, create it and any necessary information
+                    schedules = []
+                    for schedule_data in class_data["schedules"]:
+                        instructors = []
+                        for instructor_data in schedule_data["instructors"]:
+                            instructor = db_session.query(Instructor).filter_by(name=instructor_data["name"]).first()
+                            if instructor is None:
+                                instructor = Instructor(
+                                    name=instructor_data["name"],
+                                    instructor_type=instructor_data["type"]
+                                )
+                            instructors.append(instructor)
+                        db_session.add_all(instructors)
+                        schedule = ClassSchedule(
+                            location=schedule_data["building"] + " " + schedule_data["room"],
+                            instructors=instructors,
+                            days=schedule_data["days"],
+                            time=schedule_data["time"],
+                            term=term
+                        )
+                        schedules.append(schedule)
+                    db_session.add_all(schedules)
+
+                    db_session.add(Class(
+                        course_id=course_id,
+                        class_section=class_data["section"],
+                        class_number=class_data["class_number"],
+                        title=class_data["title"],
+                        component=class_data["component"],
+                        topics=class_data["topics"],
+                        term=term,
+                        hours=class_data["units"],
+                        # meeting dates, instruction type not provided
+                        schedules=schedules,
+                        enrollment_cap=class_data["enrollment_cap"],
+                        enrollment_total=class_data["enrollment_total"],
+                        waitlist_cap=class_data["waitlist_cap"],
+                        waitlist_total=class_data["waitlist_total"],
+                        min_enrollment=class_data["min_enrollment"],
+                        attributes=class_data["attributes"] if "attributes" in class_data else "",
+                        combined_section_id=class_data[
+                            "combined_section_id"] if "combined_section_id" in class_data else "",
+                        equivalents=class_data["equivalents"] if "equivalents" in class_data else "",
+                        last_updated_at=timestamp,
+                        last_updated_from="pdf"
+                    ))
+                else:
+                    # if the class does already exist, update it with new information
+                    for schedule in class_obj.schedules:
+                        db_session.delete(schedule)
+
+                        schedules = []
+                        for schedule_data in class_data["schedules"]:
+                            instructors = []
+                            for instructor_data in schedule_data["instructors"]:
+                                instructor = db_session.query(Instructor).filter_by(
+                                    name=instructor_data["name"]).first()
+                                if instructor is None:
+                                    if len(instructor_data["type"]) > 5:
+                                        print(instructor_data["type"])
+                                    instructor = Instructor(
+                                        name=instructor_data["name"],
+                                        instructor_type=instructor_data["type"]
+                                    )
+                                instructors.append(instructor)
+                            db_session.add_all(instructors)
+                            schedule = ClassSchedule(
+                                location=schedule_data["building"] + " " + schedule_data["room"],
+                                instructors=instructors,
+                                days=schedule_data["days"],
+                                time=schedule_data["time"],
+                                term=term
+                            )
+                            schedules.append(schedule)
+                        db_session.add_all(schedules)
+                        class_obj.course_id = course_id
+                        class_obj.class_section = class_data["section"]
+                        class_obj.title = class_data["title"]
+                        class_obj.component = class_data["component"]
+                        class_obj.topics = class_data["topics"]
+                        class_obj.hours = class_data["units"]
+                        # meeting dates, instruction type not provided
+                        class_obj.schedules = schedules
+                        class_obj.enrollment_cap = class_data["enrollment_cap"]
+                        class_obj.enrollment_total = class_data["enrollment_total"]
+                        class_obj.waitlist_cap = class_data["waitlist_cap"]
+                        class_obj.waitlist_total = class_data["waitlist_total"]
+                        class_obj.min_enrollment = class_data["min_enrollment"]
+                        class_obj.attributes = class_data["attributes"] if "attributes" in class_data else ""
+                        class_obj.combined_section_id = class_data[
+                            "combined_section_id"] if "combined_section_id" in class_data else ""
+                        class_obj.equivalents = class_data["equivalents"] if "equivalents" in class_data else ""
+                        class_obj.last_updated_at = timestamp
+                        class_obj.last_updated_from = "pdf"
             class_data = None
             continue
         # first line
@@ -351,11 +361,13 @@ def get_data_from_pdf(file_name):
                         "days": line[line.index("Days:") + len("Days:"):line.index("Time:")].strip(),
                         "time": line[line.index("Time:") + len("Time:"):
                                      find_nth(line[line.index("Time:") + len("Time:"):].strip(), ":", 2)
-                                     + line.index("Time:")+len("Time: ")+4].strip()}
+                                     + line.index("Time:") + len("Time: ") + 4].strip()}
+            if "TBA" in schedule["time"]:
+                schedule["time"] = "TBA"
             if "schedules" not in class_data:
                 class_data["schedules"] = []
             class_data["schedules"].append(schedule)
-        elif "Instructor:" in line:
+        elif "Instructor:" in line and not line.startswith("Instructor:"):
             if "schedules" not in class_data:
                 print("Major error occurred!!!")
             if "instructors" not in class_data["schedules"][len(class_data["schedules"]) - 1]:
@@ -372,7 +384,8 @@ def get_data_from_pdf(file_name):
                 "Class Wait Tot:")].strip()
             class_data["waitlist_total"] = line[line.index("Class Wait Tot:") + len("Class Wait Tot:"):line.index(
                 "Class Min Enrl:")].strip()
-            class_data["min_enrollment"] = line[line.index("Class Min Enrl:") + len("Class Min Enrl:"):].strip()
+            class_data["min_enrollment"] = \
+            line[line.index("Class Min Enrl:") + len("Class Min Enrl:"):].strip().split()[0]
         elif line.startswith("Attributes"):
             class_data["attributes"] = line[len("Attributes: "):]
         elif line.startswith("Combined Section ID"):
@@ -383,8 +396,10 @@ def get_data_from_pdf(file_name):
 
 
 # gets data about courses from the catalog
-def get_catalog_data():
+def process_course_catalog():
+    max_length = 0
     add_queue = []
+    timestamp = datetime.datetime.utcnow()
     for subject in tqdm(subjects, position=0, leave=False, desc="Subjects"):
         response = requests.get(f"https://catalog.unc.edu/courses/{subject.lower()}/")
 
@@ -392,59 +407,61 @@ def get_catalog_data():
                              .replace("\\xc2\\xa0", " ").encode('utf-8').decode("unicode_escape"), "html.parser")
 
         for course in tqdm(soup.select(".courseblock"), position=1, leave=False, desc=subject):
-            course_block_title_parts = course.select_one(".courseblocktitle strong").contents[0].split(". ")
             attributes = []
-            strong_text = ""
-            other_text = ""
-            description = ""
-            has_hit_br = False
-            for content_item in course.select_one(".courseblockdesc").contents:
-                if content_item.name == "br":
-                    if not has_hit_br:
-                        description = other_text
-                    has_hit_br = True
-                    if strong_text != "" and other_text != "":
-                        attributes.append(CourseAttribute(
-                            label=strong_text.strip(),
-                            value=other_text.strip().strip(".")))
+            attribute_codes = ["grading_status", "making_connections", "requisites", "repeat_rules", "idea_action",
+                               "same_as", "global_language"]
 
-                    strong_text = ""
-                    other_text = ""
-                elif content_item.name == "strong":
-                    strong_text = content_item.contents[0].strip(":")
-                else:
-                    if isinstance(content_item, NavigableString):
-                        other_text += content_item
-                    else:
-                        other_text += content_item.contents[0]
+            for attribute_code in attribute_codes:
+                attribute_block = course.select_one(".detail-" + attribute_code)
+                if attribute_block is not None:
+                    strong_text = attribute_block.select_one("strong").text
+                    other_text = attribute_block.text.replace(strong_text, "")
+                    attributes.append(CourseAttribute(
+                        label=strong_text.strip().strip(".:"),
+                        value=other_text.strip().strip(".")))
+
+            course_obj = db_session.query(Course).filter_by(
+                code=course.select_one(".detail-code strong").text.strip(".")).first()
             add_queue.extend(attributes)
-            add_queue.append(Course(
-                code=course_block_title_parts[0].strip(),
-                title=course_block_title_parts[1].strip(),
-                credits=course_block_title_parts[2].strip(".").strip(),
-                description=description.strip(),
-                attrs=attributes,
-                last_updated=datetime.datetime.utcnow()
-            ))
-    db.session.add_all(add_queue)
+
+            if course_obj is None:
+                add_queue.append(Course(
+                    code=course.select_one(".detail-code strong").text.strip("."),
+                    title=course.select_one(".detail-title strong").text.strip("."),
+                    credits=course.select_one(".detail-hours strong").text.strip("."),
+                    description=("" if course.select_one(".courseblockextra") is None else
+                                 course.select_one(".courseblockextra").text.strip(".")),
+                    attrs=attributes,
+                    last_updated_at=timestamp,
+                    last_updated_from="catalog"
+                ))
+            else:
+                for attribute in course_obj.attrs:
+                    db_session.delete(attribute)
+                course_obj.title = course.select_one(".detail-title strong").text.strip(".")
+                course_obj.credits = course.select_one(".detail-hours strong").text.strip(".")
+                course_obj.description = ("" if course.select_one(".courseblockextra") is None else
+                                          course.select_one(".courseblockextra").text.strip("."))
+                course_obj.attrs = attributes
+                course_obj.last_updated_at = timestamp
+                course_obj.last_updated_from = "catalog"
+    db_session.add_all(add_queue)
 
 
 def update_unc_data():
-    db.create_all()
+    from database import init_db
+    init_db()
 
     terms = ["2229"]
     text_terms = ["Fall 2022"]
+    process_course_catalog()
+    db_session.commit()
 
-    print(f"Deleted {db.session.query(Course).delete()} courses")
-    print(f"Deleted {db.session.query(CourseAttribute).delete()} course attributes")
-    get_catalog_data()
-    db.session.commit()
+    process_pdf_for_terms(text_terms)
+    db_session.commit()
 
-    pdf_data(text_terms)
-    db.session.commit()
-
-    get_sections_data(terms)
-    db.session.commit()
+    process_course_search_for_terms(terms)
+    db_session.commit()
 
 
 if __name__ == "__main__":

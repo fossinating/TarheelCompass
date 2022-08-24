@@ -12,19 +12,16 @@ var loaded_id = 0
 
 function add_class(class_number){
     let schedule = get_active_schedule()
-    if (!schedule.classNumbers.includes(class_number)){
-        schedule.classNumbers.push(class_number)
-        save_schedule(schedule)
-    }
+    schedule.addClass(class_number)
 
     $(".class-result[class_id='" + class_number + "']").addClass("inSchedule")
 }
 
 
 function updateClasses() {
-    var schedule = get_active_schedule()
+    let schedule = get_active_schedule()
     $(".class-result").each(function(index){
-        if (schedule.classNumbers.includes($(this).attr("class_id"))){
+        if (schedule.classNumbers.includes(parseInt($(this).attr("class_id")))){
             $(this).addClass("inSchedule")
         } else {
             $(this).removeClass("inSchedule")

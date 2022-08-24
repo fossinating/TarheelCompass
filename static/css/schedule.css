@@ -4,11 +4,12 @@
 
 #main-container {
     display: grid;
-    grid-template-columns: 30% 70%;
 
     overflow: hidden;
 
     overflow-x: auto;
+    grid-template: 1fr / 1fr;
+    height: 100%;
 }
 
 #schedule-container {
@@ -16,6 +17,8 @@
     width: 100%;
 
     overflow: auto;
+    grid-column: 1/2;
+    grid-row: 1/2;
 }
 
 #schedule {
@@ -124,18 +127,23 @@
 #class-descriptions {
     display: flex;
     visibility: collapse;
-    transition: left 0.5s ease-in-out;
-    left: -100%;
+    transition: width 0.5s ease-in-out, height 0.5s ease-in-out;
     position: relative;
     flex-shrink: 0;
-    width: 100%;
     overflow-x: hidden;
     overflow-y: auto;
-    background-color: var(--secondary-color);
+    background-color: var(--primary-color);
+    border: var(--tertiary-color) 5px solid;
+    border-radius: 15px;
+    margin: auto;
+    pointer-events: all;
+    width: 0;
+    height: 0;
 }
 
 #class-descriptions.visible {
-    left: 0;
+    width: 60%;
+    height: 75%;
 }
 
 .class-description {
@@ -187,6 +195,10 @@
     margin: 0.5rem;
 }
 
+#content {
+    overflow: clip;
+}
+
 
 /* Inline #3 | http://127.0.0.1:5000/ */
 
@@ -203,8 +215,11 @@
 #menu-container {
     display: grid;
     height: 100%;
-    background-color: var(--secondary-color);
     overflow: hidden;
+    grid-column: 1/2;
+    grid-row: 1/2;
+    z-index: 100;
+    pointer-events: none;
 }
 
 #menu-items {
@@ -218,6 +233,8 @@
     grid-column: 1;
     grid-row: 1;
 }
+
+
 
 @media screen and (max-width: 600px) {
     #main-container {

@@ -6,9 +6,6 @@
 {% block content %}
 <div id="main-container">
 <div id="menu-container">
-    <div id="menu-items">
-        Select a class to see more information here
-    </div>
 <div id="class-descriptions">
 <div class="close-description-button button" onclick="close_class_details()">x</div>
 <!-- Filled by requests -->
@@ -36,6 +33,6 @@
 </div>
 {% endblock %}
 {% block script %}
-<script src="{{ url_for("static", filename="js/schedule_manager.js") }}"></script>
+{% include 'schedule_manager.html' %}
 <script src="{{ url_for("static", filename="js/schedule.js") }}"></script>
 {% endblock %}

@@ -3,9 +3,12 @@ import random
 import uuid
 
 from flask import render_template, Response, request
+from flask_login import current_user
+from sqlalchemy import text
+
 from __init__ import app
-from database import db
-from models import Class
+from database import db_session
+from models import Class, UserSchedule
 from utilities import humanize_hour
 
 
@@ -15,15 +18,19 @@ def utility_processor():
     return dict(generate_color=generate_color, human_time=human_time)
 
 
+current_term = 2229
+
+
 class Schedule:
     id = ""
     classes = []
     name = "Unnamed Schedule"
+
     def __init__(self, json_schedule):
         self.id = json_schedule["id"]
         self.name = json_schedule["name"]
         for class_number in json_schedule["class_numbers"]:
-            self.classes.append(db.session.query(Class).filter_by(class_number=class_number).first())
+            self.classes.append(db_session.query(Class).filter_by(class_number=class_number).first())
 
     def to_json(self):
         return {
@@ -70,6 +77,28 @@ def schedule_viewer():
     return response
 
 
+@app.route('/group', methods=["GET"])
+def group():
+    response = Response()
+
+    #schedule = get_active_schedule(request, response)
+
+    response.data = render_template("schedule.html")
+
+    return response
+
+
+@app.route('/privacy_policy', methods=["GET"])
+def privacy_policy():
+    response = Response()
+
+    #schedule = get_active_schedule(request, response)
+
+    response.data = render_template("schedule.html")
+
+    return response
+
+
 @app.route('/search', methods=["GET"])
 def search():
     response = Response()
@@ -85,11 +114,11 @@ def search():
 # TODO: Fade if class already in schedule
 # TODO: Fade if class conflicts with schedule
 def class_search():
-    q = db.session.query(Class)
+    q = db_session.query(Class)
     if request.form.get("class_code") != "":
-        q = q.filter(getattr(Class, "course_id").like("%%%s%%" % request.form.get("class_code")))
+        q = q.filter(Class.course_id.ilike(f"%{request.form.get('class_code')}%", escape="\\"))
     if request.form.get("component") != "any":
-        q = q.filter(getattr(Class, "component").like("%%%s%%" % request.form.get("component")))
+        q = q.filter(Class.component.ilike(f"%{request.form.get('component')}%", escape="\\"))
 
     return render_template("search-result.html",
                            classes=q.order_by(Class.course_id, Class.class_section).limit(50).all())
@@ -99,7 +128,7 @@ def class_search():
 def schedule_maker():
     response_data = []
     for class_number in request.json["classNumbers"]:
-        class_obj = db.session.query(Class).filter_by(class_number=class_number).first()
+        class_obj = db_session.query(Class).filter_by(class_number=class_number).first()
         if class_obj is None:
             print(f"Someone had an invalid class {class_number}")
             continue
@@ -112,6 +141,76 @@ def schedule_maker():
                 "parent": f"#{timeslot['day']}",
                 "html": render_template("class_slot.html", class_obj=class_obj, timeslot=timeslot)})
     return json.dumps(response_data)
+
+
+# put migrate {schedules, active_schedule_id}
+# put update_active_schedule {schedule_id}
+# put create_schedule
+@app.route('/api/user', methods=["POST", "GET", "OPTIONS"])
+def user_endpoint():
+    if request.method == "GET":
+        return current_user.to_json()
+    elif request.method == "POST":
+        if request.json["action"] == "migrate":
+            schedules = []
+            schedules_json = json.loads(request.json["schedules"])
+            for schedule_data in schedules_json.values():
+                term = schedule_data["term"] if "term" in schedule_data else current_term
+                schedules.append(UserSchedule(
+                    id=uuid.UUID(schedule_data["id"]) if "id" in schedule_data else uuid.UUID(),
+                    display_name=schedule_data["displayName"],
+                    term=term,
+                    classes=[
+                        db_session.query(Class).filter(
+                            Class.class_number == int(class_number), Class.term == term
+                        ).first()
+                        for class_number
+                        in schedule_data["classNumbers"]
+                    ]
+                ))
+            current_user.schedules = schedules
+            db_session.add_all(schedules)
+            db_session.flush()
+            current_user.active_schedule_id = request.json["active_schedule_id"]
+            db_session.commit()
+            return current_user.to_json()
+        elif request.json["action"] == "update_active_schedule":
+            current_user.active_schedule_id = request.json["active_schedule_id"]
+            db_session.commit()
+            return current_user.to_json()
+        elif request.json["action"] == "create_schedule":
+            schedule = UserSchedule(
+                term=current_term,
+                display_name="New Schedule"
+            )
+            db_session.add(schedule)
+            current_user.schedules.append(schedule)
+            db_session.commit()
+            return current_user.to_json()
+
+
+# put add_class {schedule_id, class_number}
+# put remove_class {schedule_id, class_number}
+# put set_display_name {schedule_id, displayName}
+@app.route('/api/user/schedule', methods=["POST"])
+def user_schedule_endpoint():
+    schedule = db_session.query(UserSchedule).filter(
+        UserSchedule.user_id == current_user.id, UserSchedule.id == uuid.UUID(request.json["schedule_id"])).first()
+    if request.json["action"] == "add_class":
+        class_obj = db_session.query(Class).filter(
+            Class.class_number == int(request.json["class_number"]), Class.term == schedule.term
+        ).first()
+        schedule.classes.append(class_obj)
+    elif request.json["action"] == "remove_class":
+        for class_obj in schedule.classes:
+            print(class_obj.class_number, int(request.json["class_number"]))
+            if class_obj.class_number == int(request.json["class_number"]):
+                print("removing")
+                schedule.classes.remove(class_obj)
+    elif request.json["action"] == "set_display_name":
+        schedule.display_name = request.json["displayName"]
+    db_session.commit()
+    return current_user.to_json()
 
 
 app.jinja_env.globals.update(humanize_hour=humanize_hour)
