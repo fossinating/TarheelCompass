@@ -4,7 +4,7 @@ from flask import Flask
 
 from flask import Flask, render_template_string, render_template, redirect, flash, request, Response
 from flask_mail import Mail
-from flask_security import Security, current_user, auth_required, hash_password, \
+from flask_security import Security, current_user, auth_required, \
     SQLAlchemySessionUserDatastore, login_required
 from flask_wtf import CSRFProtect
 import config
