@@ -245,3 +245,4 @@ fabric.properties
 ssb-collection/*
 *.db
 database.db-journal
+secrets.py
