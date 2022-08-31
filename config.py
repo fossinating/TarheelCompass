@@ -22,7 +22,7 @@ AUTH_USER_REGISTRATION_ROLE = 'Public'
 FAB_PASSWORD_COMPLEXITY_ENABLED = True
 
 # Database information
-DB_TYPE = "postgres"
+DB_TYPE = "postgresql"
 DB_USERNAME = "postgres"
 DB_PASSWORD = getenv("DB_PASSWORD")
 DB_PATH = "localhost"
