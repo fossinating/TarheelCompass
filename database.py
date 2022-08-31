@@ -2,7 +2,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine('postgresql://postgres:Dl4x1YdgGBHS@localhost/coursemanager')
+import config
+
+engine = create_engine(
+    f"{config.DB_TYPE}://{config.DB_USERNAME}:{config.DB_PASSWORD}@{config.DB_PATH}/{config.DB_DATABASE_NAME}")
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=True,
                                          bind=engine))
