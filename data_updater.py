@@ -1,3 +1,4 @@
+import dataclasses
 import datetime
 import os
 import urllib.request
@@ -11,7 +12,7 @@ from os.path import exists
 import filecmp
 
 from models import Course, Class, ClassSchedule, Instructor, CourseAttribute
-from utilities import search_to_schedule, get_or_create_instructor, safe_cast
+from utilities import search_to_schedule, get_or_create_instructor, safe_cast, standardize_term
 from database import db_session
 
 
@@ -93,13 +94,13 @@ def process_course_search_for_term(term):
 
         class_number = safe_cast(class_data["class number"], int, -1)
 
-        class_obj = db_session.query(Class).filter_by(class_number=class_number, term=term).first()
+        class_obj = db_session.query(Class).filter_by(class_number=class_number, term=standardize_term(term)).first()
         if class_obj is None:
             if str(class_number) in missing_classes:
                 continue
             missing_classes.append(str(class_number))
 
-            schedule = search_to_schedule(class_data, term)
+            schedule = search_to_schedule(class_data, standardize_term(term))
             db_session.add(schedule)
 
             db_session.add(Class(
@@ -107,7 +108,7 @@ def process_course_search_for_term(term):
                 class_section=class_data["section number"],
                 class_number=class_number,
                 title=class_data["course description"],
-                term=term,
+                term=standardize_term(term),
                 hours=safe_cast(class_data["credit hours"], float, -1.0),
                 meeting_dates=class_data["meeting dates"],
                 instruction_type=class_data["instruction mode"],
@@ -121,7 +122,7 @@ def process_course_search_for_term(term):
             class_obj.meeting_dates = class_data["meeting dates"]
             # add/update the instruction type since this isn't scraped from the pdf
             class_obj.instruction_type = class_data["instruction mode"]
-            generated_schedule = search_to_schedule(class_data, term)
+            generated_schedule = search_to_schedule(class_data, standardize_term(term))
             found_match = False
             # search through all of the schedules to find a matching one
             for schedule in class_obj.schedules:
@@ -161,8 +162,8 @@ def process_pdf_for_terms(terms):
         if link.text in terms:
             source = link["href"]
             term = source.split("/")[-1].split("-")[0]
-            filename = "ssb-collection/" + term + ".pdf"
-            temp_filename = "temp/" + term + ".pdf"
+            filename = "ssb-collection/" + standardize_term(term) + ".pdf"
+            temp_filename = "temp/" + standardize_term(term) + ".pdf"
             if not exists("temp/"):
                 os.mkdir("temp")
             if not exists("ssb-collection/"):
@@ -172,7 +173,7 @@ def process_pdf_for_terms(terms):
             print(f"Downloading {filename} from {source}")
             urllib.request.urlretrieve(source, temp_filename)
 
-            if not exists(filename) or not filecmp.cmp(filename, temp_filename):
+            if True or not exists(filename) or not filecmp.cmp(filename, temp_filename):
                 print("File changed, analysing new PDF")
                 if exists(filename):
                     os.remove(filename)
@@ -199,6 +200,7 @@ def process_pdf(file_name):
             if len(class_data) > 0:
                 course_id = class_data["dept"] + " " + class_data["catalog_number"]
                 # check to see if the course exists, if not leave a warning
+
                 if db_session.query(Course.code).filter_by(
                         code=course_id).first() is None and course_id not in missing_courses:
                     missing_courses.append(course_id)
@@ -265,49 +267,50 @@ def process_pdf(file_name):
                     for schedule in class_obj.schedules:
                         db_session.delete(schedule)
 
-                        schedules = []
-                        for schedule_data in class_data["schedules"]:
-                            instructors = []
-                            for instructor_data in schedule_data["instructors"]:
-                                instructor = db_session.query(Instructor).filter_by(
-                                    name=instructor_data["name"]).first()
-                                if instructor is None:
-                                    if len(instructor_data["type"]) > 5:
-                                        print(instructor_data["type"])
-                                    instructor = Instructor(
-                                        name=instructor_data["name"],
-                                        instructor_type=instructor_data["type"]
-                                    )
-                                instructors.append(instructor)
-                            db_session.add_all(instructors)
-                            schedule = ClassSchedule(
-                                location=schedule_data["building"] + " " + schedule_data["room"],
-                                instructors=instructors,
-                                days=schedule_data["days"],
-                                time=schedule_data["time"],
-                                term=term
-                            )
-                            schedules.append(schedule)
-                        db_session.add_all(schedules)
-                        class_obj.course_id = course_id
-                        class_obj.class_section = class_data["section"]
-                        class_obj.title = class_data["title"]
-                        class_obj.component = class_data["component"]
-                        class_obj.topics = class_data["topics"]
-                        class_obj.hours = class_data["units"]
-                        # meeting dates, instruction type not provided
-                        class_obj.schedules = schedules
-                        class_obj.enrollment_cap = class_data["enrollment_cap"]
-                        class_obj.enrollment_total = class_data["enrollment_total"]
-                        class_obj.waitlist_cap = class_data["waitlist_cap"]
-                        class_obj.waitlist_total = class_data["waitlist_total"]
-                        class_obj.min_enrollment = class_data["min_enrollment"]
-                        class_obj.attributes = class_data["attributes"] if "attributes" in class_data else ""
-                        class_obj.combined_section_id = class_data[
-                            "combined_section_id"] if "combined_section_id" in class_data else ""
-                        class_obj.equivalents = class_data["equivalents"] if "equivalents" in class_data else ""
-                        class_obj.last_updated_at = timestamp
-                        class_obj.last_updated_from = "pdf"
+                    schedules = []
+                    for schedule_data in class_data["schedules"]:
+                        instructors = []
+                        for instructor_data in schedule_data["instructors"]:
+                            instructor = db_session.query(Instructor).filter_by(
+                                name=instructor_data["name"]).first()
+                            if instructor is None:
+                                if len(instructor_data["type"]) > 5:
+                                    print(instructor_data["type"])
+                                instructor = Instructor(
+                                    name=instructor_data["name"],
+                                    instructor_type=instructor_data["type"]
+                                )
+                            instructors.append(instructor)
+                        db_session.add_all(instructors)
+                        schedule = ClassSchedule(
+                            class_reference=class_obj,
+                            location=schedule_data["building"] + " " + schedule_data["room"],
+                            instructors=instructors,
+                            days=schedule_data["days"],
+                            time=schedule_data["time"],
+                            term=standardize_term(term)
+                        )
+                        schedules.append(schedule)
+                    db_session.add_all(schedules)
+                    class_obj.course_id = course_id
+                    class_obj.class_section = class_data["section"]
+                    class_obj.title = class_data["title"]
+                    class_obj.component = class_data["component"]
+                    class_obj.topics = class_data["topics"]
+                    class_obj.hours = class_data["units"]
+                    # meeting dates, instruction type not provided
+                    class_obj.schedules = schedules
+                    class_obj.enrollment_cap = class_data["enrollment_cap"]
+                    class_obj.enrollment_total = class_data["enrollment_total"]
+                    class_obj.waitlist_cap = class_data["waitlist_cap"]
+                    class_obj.waitlist_total = class_data["waitlist_total"]
+                    class_obj.min_enrollment = class_data["min_enrollment"]
+                    class_obj.attributes = class_data["attributes"] if "attributes" in class_data else ""
+                    class_obj.combined_section_id = class_data[
+                        "combined_section_id"] if "combined_section_id" in class_data else ""
+                    class_obj.equivalents = class_data["equivalents"] if "equivalents" in class_data else ""
+                    class_obj.last_updated_at = timestamp
+                    class_obj.last_updated_from = "pdf"
             class_data = None
             continue
         # first line
@@ -452,15 +455,13 @@ def update_unc_data():
     from database import init_db
     init_db()
 
-    terms = ["2229"]
-    text_terms = ["Fall 2022"]
     process_course_catalog()
     db_session.commit()
 
-    process_pdf_for_terms(text_terms)
+    process_pdf_for_terms(["Fall 2022"])
     db_session.commit()
 
-    process_course_search_for_terms(terms)
+    process_course_search_for_terms(["2022 Fall"])
     db_session.commit()
 
 
