@@ -288,7 +288,7 @@ def process_pdf(file_name):
                             instructors=instructors,
                             days=schedule_data["days"],
                             time=schedule_data["time"],
-                            term=standardize_term(term)
+                            term=term
                         )
                         schedules.append(schedule)
                     db_session.add_all(schedules)
