@@ -239,11 +239,17 @@
 @media screen and (max-width: 600px) {
     #main-container {
         grid-template-columns: 1fr;
-        grid-template-rows: 70% 30%;
+        grid-template-rows: 1fr auto;
+    }
+
+    #schedule-container {
+        grid-row: 1/3;
     }
 
     #menu-container {
         grid-row: 2/3;
+        max-height: 40vh;
+        background-color: transparent;
     }
 
     #class-descriptions {
@@ -253,5 +259,7 @@
 
     #class-descriptions.visible {
         bottom: 0;
+        width: 100%;
+        height: 100%;
     }
 }

@@ -71,7 +71,7 @@ body {
 }
 
 #menu-bar.expanded {
-    max-width: 15vw;
+    max-width: max(12rem, 15vw);
 }
 
 /* https://www.w3schools.com/howto/howto_css_menu_icon.asp */
