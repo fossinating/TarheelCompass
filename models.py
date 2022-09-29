@@ -30,7 +30,7 @@ class Class(Base):
     title = Column(Text)
     component = Column(Text)
     topics = Column(Text)
-    term = Column(Integer, primary_key=True)
+    term = Column(String(8), primary_key=True)
     hours = Column(Float)
     meeting_dates = Column(String(30))
     instruction_type = Column(String)
@@ -88,7 +88,7 @@ class ClassSchedule(Base):
     days = Column(String(10))
     time = Column(String(15))
     class_number = Column(Integer)
-    term = Column(Integer)
+    term = Column(String(8))
     __table_args__ = (ForeignKeyConstraint((class_number, term), (Class.class_number, Class.term)), {})
     class_reference = relationship("Class",
                                    back_populates="schedules")
@@ -162,7 +162,7 @@ class ClassUserSchedule(Base):
     entry_id = Column(Integer, primary_key=True)
     user_schedule_id = Column(ForeignKey("user_schedule.id"))
     class_number = Column(Integer)
-    term = Column(Integer)
+    term = Column(String(8))
     __table_args__ = (ForeignKeyConstraint((class_number, term), (Class.class_number, Class.term)), {})
 
 
@@ -171,7 +171,7 @@ class UserSchedule(Base):
     id = Column(UUID(as_uuid=True), primary_key=True)
     user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"))
     display_name = Column(String(30))
-    term = Column(Integer)
+    term = Column(String(8))
     classes = relationship("Class", secondary="class_user_schedule")
 
     def to_json(self):

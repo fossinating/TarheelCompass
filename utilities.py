@@ -45,6 +45,15 @@ def get_or_create_instructor(name):
     return instructor
 
 
+def standardize_term(term):
+    data = {
+        "Fall 2022": "FALL2022",
+        "2022 Fall": "FALL2022",
+        "2229": "FALL2022"
+    }
+    return data[term]
+
+
 def search_to_schedule(class_data, term):
     class_number = safe_cast(class_data["class number"], int, -1)
 
