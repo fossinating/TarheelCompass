@@ -64,51 +64,6 @@ def get_active_schedule(request, response):
         return schedule
 
 
-# TODO: accounts system to save schedules, watched classes, etc
-# TODO: share schedule with friends to get a colored overlay
-@app.route('/', methods=["GET"])
-def schedule_viewer():
-    response = Response()
-
-    #schedule = get_active_schedule(request, response)
-
-    response.data = render_template("schedule.html")
-
-    return response
-
-
-@app.route('/group', methods=["GET"])
-def group():
-    response = Response()
-
-    #schedule = get_active_schedule(request, response)
-
-    response.data = render_template("schedule.html")
-
-    return response
-
-
-@app.route('/privacy_policy', methods=["GET"])
-def privacy_policy():
-    response = Response()
-
-    #schedule = get_active_schedule(request, response)
-
-    response.data = render_template("schedule.html")
-
-    return response
-
-
-@app.route('/search', methods=["GET"])
-def search():
-    response = Response()
-
-    schedule = get_active_schedule(request, response)
-
-    response.data = render_template("search.html", schedule=schedule)
-    return response
-
-
 @app.route('/api/search', methods=["POST"])
 # TODO: Search by name, professor, geneds
 # TODO: Fade if class already in schedule
