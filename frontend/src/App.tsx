@@ -2,7 +2,9 @@ import React from 'react';
 import logo from './logo.svg';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./pages/Layout";
-import Home from "./pages/Home";
+import Schedules from "./pages/Schedules";
+import Search from "./pages/Search";
+import NoPage from './pages/NoPage';
 import './App.css';
 
 function App() {
@@ -10,7 +12,9 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
+          <Route index element={<Schedules />} />
+          <Route path="search" element={<Search />} />
+          <Route path="*" element={<NoPage />}/>
         </Route>
       </Routes>
     </BrowserRouter>
