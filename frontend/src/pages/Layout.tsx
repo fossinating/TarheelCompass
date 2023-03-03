@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 
+import './Layout.css';
 import * as React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -18,8 +19,16 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import CalendarViewWeekIcon from '@mui/icons-material/CalendarViewWeek';
 import SearchIcon from '@mui/icons-material/Search';
+import { Link as RouterLink, LinkProps as RouterLinkProps } from "react-router-dom";
 
 const drawerWidth = 240;
+
+const Link = React.forwardRef<HTMLAnchorElement, RouterLinkProps>(function Link(
+  itemProps,
+  ref,
+) {
+  return <RouterLink ref={ref} {...itemProps} role={undefined} />;
+});
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
   open?: boolean;
@@ -90,14 +99,10 @@ export default function Layout() {
     setOpen(!open);
   };
 
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box id="layoutContainer">
       <CssBaseline />
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      <AppBar id="headerBar" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
           <IconButton
             color="inherit"
@@ -109,11 +114,11 @@ export default function Layout() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Clipped drawer
+            Course Manager
           </Typography>
         </Toolbar>
       </AppBar>
-      <Drawer
+      <Drawer id="drawer"
         sx={{
           width: drawerWidth,
           flexShrink: 0,
@@ -130,21 +135,22 @@ export default function Layout() {
         <Divider />
         <List>
           {[
-            new NavItem("Schedule", <CalendarViewWeekIcon/>, "schedule"), 
-            new NavItem("Search", <SearchItem/>, "search")].map((item, index) => (
-            <ListItem key={item.label} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {obj[1]}
-              </ListItemIcon>
-              <ListItemText primary={item.element} />
-            </ListItemButton>
+            new NavItem("Schedule", <CalendarViewWeekIcon/>, ""), 
+            new NavItem("Search", <SearchIcon/>, "search")
+          ].map((item, index) => (
+          <ListItem key={item.label} disablePadding>
+              <ListItemButton component={Link} to={item.page}>
+                <ListItemIcon>
+                  {item.element}
+                </ListItemIcon>
+                <ListItemText primary={item.label}>
+                </ListItemText>
+              </ListItemButton>
           </ListItem>
           ))}
         </List>
       </Drawer>
-      <Main open={open}>
-        <DrawerHeader />
+      <Main id="mainContainer" open={open}>
         <Outlet></Outlet>
       </Main>
     </Box>
