@@ -1,0 +1,12 @@
+#resultsContainer {
+    display: flex;
+    margin-top: 2rem;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.classDisplay {
+    margin: 1em;
+}
