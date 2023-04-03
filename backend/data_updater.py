@@ -48,8 +48,7 @@ subjects = (
 
 
 def process_course_search_for_terms(terms):
-    for term in terms:
-        process_course_search_for_term(term)
+    process_course_search_for_term(", ".join(terms))
 
 
 # gets information about classes from the class search
@@ -94,13 +93,14 @@ def process_course_search_for_term(term):
 
         class_number = safe_cast(class_data["class number"], int, -1)
 
-        class_obj = db_session.query(Class).filter_by(class_number=class_number, term=standardize_term(term)).first()
+        class_obj = db_session.query(Class).filter_by(
+            class_number=class_number, term=standardize_term(class_data["term"])).first()
         if class_obj is None:
             if str(class_number) in missing_classes:
                 continue
             missing_classes.append(str(class_number))
 
-            schedule = search_to_schedule(class_data, standardize_term(term))
+            schedule = search_to_schedule(class_data, standardize_term(class_data["term"]))
             db_session.add(schedule)
 
             db_session.add(Class(
@@ -108,7 +108,7 @@ def process_course_search_for_term(term):
                 class_section=class_data["section number"],
                 class_number=class_number,
                 title=class_data["course description"],
-                term=standardize_term(term),
+                term=standardize_term(class_data["term"]),
                 hours=safe_cast(class_data["credit hours"], float, -1.0),
                 meeting_dates=class_data["meeting dates"],
                 instruction_type=class_data["instruction mode"],
@@ -122,16 +122,16 @@ def process_course_search_for_term(term):
             class_obj.meeting_dates = class_data["meeting dates"]
             # add/update the instruction type since this isn't scraped from the pdf
             class_obj.instruction_type = class_data["instruction mode"]
-            generated_schedule = search_to_schedule(class_data, standardize_term(term))
+            generated_schedule = search_to_schedule(class_data, standardize_term(class_data["term"]))
             found_match = False
             # search through all of the schedules to find a matching one
             for schedule in class_obj.schedules:
                 if generated_schedule.days == schedule.days and generated_schedule.time == schedule.time:
                     found_match = True
                     # if a match is found, check if the instructor is included
-                    if class_data["instructor name"] not in [instructor.name for instructor in schedule.instructors]:
+                    if class_data["primary instructor name(s)"] not in [instructor.name for instructor in schedule.instructors]:
                         # if instructor not included, add it
-                        schedule.instructors.append(get_or_create_instructor(class_data["instructor name"]))
+                        schedule.instructors.append(get_or_create_instructor(class_data["primary instructor name(s)"]))
                     break
 
             # if a matching schedule not found, add the generated one
@@ -184,6 +184,7 @@ def process_pdf_for_terms(terms):
                 os.remove(temp_filename)
 
 
+# TODO: Rewrite to cache everything and then input at the very end
 def process_pdf(file_name):
     print(f"Processing {file_name}")
 
@@ -219,7 +220,9 @@ def process_pdf(file_name):
                     # if the class doesn't exist yet, create it and any necessary information
                     schedules = []
                     for schedule_data in class_data["schedules"]:
+                        #print(schedule_data)
                         instructors = []
+
                         for instructor_data in schedule_data["instructors"]:
                             instructor = db_session.query(Instructor).filter_by(name=instructor_data["name"]).first()
                             if instructor is None:
@@ -227,7 +230,8 @@ def process_pdf(file_name):
                                     name=instructor_data["name"],
                                     instructor_type=instructor_data["type"]
                                 )
-                            instructors.append(instructor)
+                            if instructor not in instructors:
+                                instructors.append(instructor)
                         db_session.add_all(instructors)
                         schedule = ClassSchedule(
                             location=schedule_data["building"] + " " + schedule_data["room"],
@@ -264,12 +268,15 @@ def process_pdf(file_name):
                     ))
                 else:
                     # if the class does already exist, update it with new information
+                    print(class_data["class_number"])
                     for schedule in class_obj.schedules:
                         db_session.delete(schedule)
 
                     schedules = []
                     for schedule_data in class_data["schedules"]:
                         instructors = []
+                        # print(schedule_data["instructors"])
+
                         for instructor_data in schedule_data["instructors"]:
                             instructor = db_session.query(Instructor).filter_by(
                                 name=instructor_data["name"]).first()
@@ -280,7 +287,8 @@ def process_pdf(file_name):
                                     name=instructor_data["name"],
                                     instructor_type=instructor_data["type"]
                                 )
-                            instructors.append(instructor)
+                            if instructor not in instructors:
+                                instructors.append(instructor)
                         db_session.add_all(instructors)
                         schedule = ClassSchedule(
                             class_reference=class_obj,
@@ -370,7 +378,7 @@ def process_pdf(file_name):
             if "schedules" not in class_data:
                 class_data["schedules"] = []
             class_data["schedules"].append(schedule)
-        elif "Instructor:" in line and not line.startswith("Instructor:"):
+        elif "Instructor:" in line and not line.startswith("Instructor:") and "enrollment_cap" not in class_data:
             if "schedules" not in class_data:
                 print("Major error occurred!!!")
             if "instructors" not in class_data["schedules"][len(class_data["schedules"]) - 1]:
@@ -431,7 +439,7 @@ def process_course_catalog():
                 add_queue.append(Course(
                     code=course.select_one(".detail-code strong").text.strip("."),
                     title=course.select_one(".detail-title strong").text.strip("."),
-                    credits=course.select_one(".detail-hours strong").text.strip("."),
+                    credits=course.select_one(".detail-hours strong").text.strip(".").replace(" Credits", ""),
                     description=("" if course.select_one(".courseblockextra") is None else
                                  course.select_one(".courseblockextra").text.strip(".")),
                     attrs=attributes,
@@ -442,7 +450,7 @@ def process_course_catalog():
                 for attribute in course_obj.attrs:
                     db_session.delete(attribute)
                 course_obj.title = course.select_one(".detail-title strong").text.strip(".")
-                course_obj.credits = course.select_one(".detail-hours strong").text.strip(".")
+                course_obj.credits = course.select_one(".detail-hours strong").text.strip(".").replace(" Credits", "")
                 course_obj.description = ("" if course.select_one(".courseblockextra") is None else
                                           course.select_one(".courseblockextra").text.strip("."))
                 course_obj.attrs = attributes
@@ -458,11 +466,11 @@ def update_unc_data():
     process_course_catalog()
     db_session.commit()
 
-    process_pdf_for_terms(["Fall 2022"])
-    db_session.commit()
+    #process_pdf_for_terms(["Spring 2023", "Fall 2023"])
+    #db_session.commit()
 
-    process_course_search_for_terms(["2022 Fall"])
-    db_session.commit()
+    #process_course_search_for_terms(["2023 Spring", "2023 Fall"])
+    #db_session.commit()
 
 
 if __name__ == "__main__":
