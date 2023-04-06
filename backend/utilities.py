@@ -49,7 +49,12 @@ def standardize_term(term):
     data = {
         "Fall 2022": "FALL2022",
         "2022 Fall": "FALL2022",
-        "2229": "FALL2022"
+        "2229": "FALL2022",
+        "2232": "SPRI2023",
+        "Spring 2023": "SPRI2023",
+        "2023 Spring": "SPRI2023",
+        "Fall 2023": "FALL2023",
+        "2023 Fall": "FALL2023"
     }
     return data[term]
 
@@ -92,7 +97,7 @@ def search_to_schedule(class_data, term):
         time = " - ".join([translate_time(src_time) for src_time in
                            class_data["schedule"][class_data["schedule"].find(" ") + 1:].split("-")])
 
-        instructors = [get_or_create_instructor(class_data["instructor name"])]
+        instructors = [get_or_create_instructor(class_data["primary instructor name(s)"])]
 
     return ClassSchedule(
         location=class_data["room"],

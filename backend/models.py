@@ -5,13 +5,15 @@ from sqlalchemy.dialects.postgresql import UUID
 from database import Base
 from flask_security import UserMixin, RoleMixin
 from sqlalchemy import create_engine, Enum, Table, Float, Boolean, DateTime, Column, Integer, \
-    String, ForeignKey, Text, SmallInteger, ForeignKeyConstraint
+    String, ForeignKey, Text, SmallInteger, ForeignKeyConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship, backref
 
 schedule_instructor_join_table = Table("schedule_instructor_join_table",
                                        Base.metadata,
+                                       Column("join_id", Integer, primary_key=True),
                                        Column("instructor_id", ForeignKey("instructor.id")),
-                                       Column("schedule_id", ForeignKey("class_schedule.id")))
+                                       Column("schedule_id", ForeignKey("class_schedule.id")),
+                                       UniqueConstraint("instructor_id", "schedule_id"),)
 
 
 class Instructor(Base):
@@ -45,6 +47,25 @@ class Class(Base):
     equivalents = Column(Text)
     last_updated_at = Column(DateTime)
     last_updated_from = Column(String(7))
+
+    def to_json(self):
+        return {
+            "course_code": self.course_id,
+            "section_code": self.class_section,
+            "description": self.course.description,
+            "schedules": [schedule.to_json() for schedule in self.schedules],
+            "class_number": self.class_number,
+            "component": self.component,
+            "term": self.term,
+            "credits": self.course.credits,
+            "instruction_type": self.instruction_type,
+            "enrollment_cap": self.enrollment_cap,
+            "enrollment_total": self.enrollment_total,
+            "waitlist_cap": self.waitlist_cap,
+            "waitlist_total": self.waitlist_total,
+            "min_enrollment": self.min_enrollment,
+            "attributes": self.attributes
+        }
 
     def get_timeslots(self):
         timeslots = []
@@ -95,6 +116,14 @@ class ClassSchedule(Base):
 
     def instructors_string(self):
         return "; ".join([instructor.name for instructor in self.instructors])
+
+    def to_json(self):
+        return {
+            "location": self.location,
+            "instructors": [instructor.name for instructor in self.instructors],
+            "days": self.days,
+            "time": self.time
+        }
 
 
 class CourseAttribute(Base):
