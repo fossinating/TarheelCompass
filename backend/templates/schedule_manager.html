@@ -1,5 +1,0 @@
-{% if current_user.is_authenticated %}
-<script src="{{ url_for("static", filename="js/account_schedule_manager.js") }}"></script>
-{% else %}
-<script src="{{ url_for("static", filename="js/local_schedule_manager.js") }}"></script>
-{% endif %}
