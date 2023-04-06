@@ -1,33 +1,20 @@
-import { Card, Title, Text } from '@tremor/react';
-import { queryBuilder } from '../lib/planetscale';
-import Search from './search';
-import UsersTable from './table';
+import React from 'react';
+import './index.css';
+import App from './App';
+//import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+//import reportWebVitals from './reportWebVitals';
+import Schedules from './pages/Schedules';
 
-export const dynamic = 'force-dynamic';
-
-export default async function IndexPage({
-  searchParams
-}: {
-  searchParams: { q: string };
-}) {
-  const search = searchParams.q ?? '';
-  const users = await queryBuilder
-    .selectFrom('users')
-    .select(['id', 'name', 'username', 'email'])
-    .where('name', 'like', `%${search}%`)
-    .execute();
-
-  return (
-    <main className="p-4 md:p-10 mx-auto max-w-7xl">
-      <Title>Users</Title>
-      <Text>
-        A list of users retrieved from a MySQL database (PlanetScale).
-      </Text>
-      <Search />
-      <Card className="mt-6">
-        {/* @ts-expect-error Server Component */}
-        <UsersTable users={users} />
-      </Card>
-    </main>
-  );
+export default function Page() {
+  return <Schedules></Schedules>
 }
+
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://cra.link/PWA
+//serviceWorkerRegistration.unregister();
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+//reportWebVitals();
