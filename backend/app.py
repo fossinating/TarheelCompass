@@ -65,18 +65,16 @@ def get_active_schedule(request, response):
 
 
 @app.route('/api/search', methods=["POST"])
-# TODO: Search by name, professor, geneds
-# TODO: Fade if class already in schedule
-# TODO: Fade if class conflicts with schedule
 def class_search():
     q = db_session.query(Class)
-    if request.form.get("class_code") != "":
-        q = q.filter(Class.course_id.ilike(f"%{request.form.get('class_code')}%", escape="\\"))
-    if request.form.get("component") != "any":
-        q = q.filter(Class.component.ilike(f"%{request.form.get('component')}%", escape="\\"))
+    data = json.loads(request.data)
+    if "code" in data and data["code"] != "":
+        q = q.filter(Class.course_id.ilike(f"%{data['code']}%", escape="\\"))
+    if "component" in data and data["component"] != "any":
+        q = q.filter(Class.component.ilike(f"%{data['component']}%", escape="\\"))
+    q = q.filter(Class.term == data["term"])
 
-    return render_template("search-result.html",
-                           classes=q.order_by(Class.course_id, Class.class_section).limit(50).all())
+    return json.dumps([result.to_json() for result in q.order_by(Class.course_id, Class.class_section).limit(50).all()])
 
 
 @app.route('/api/schedule', methods=["POST", "OPTIONS"])

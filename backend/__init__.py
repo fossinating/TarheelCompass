@@ -10,6 +10,7 @@ from flask_wtf import CSRFProtect
 import config
 from database import db_session
 from models import User, Role
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
 csrf = CSRFProtect(app)
@@ -22,6 +23,11 @@ app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY", 'pf9Wkove4IKEAXvy-cQkeDP
 # Generate a good salt using: secrets.SystemRandom().getrandbits(128)
 app.config['SECURITY_PASSWORD_SALT'] = os.environ.get("SECURITY_PASSWORD_SALT",
                                                       '146585145368132386173505678016728509634')
+
+app.wsgi_app = ProxyFix(
+    app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
+)
+
 
 # Setup Flask-Security
 user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)

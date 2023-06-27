@@ -11,7 +11,7 @@ SECURITY_PASSWORD_HASH = "argon2"
 
 # user registration information
 SECURITY_REGISTERABLE = True
-SECURITY_USERNAME_ENABLE = True
+#SECURITY_USERNAME_ENABLE = True
 SECURITY_USERNAME_REQUIRED = True
 SECURITY_PASSWORD_CHECK_BREACHED = True
 SECURITY_PASSWORD_BREACHED_COUNT = 50
@@ -27,7 +27,7 @@ DB_TYPE = "postgresql"
 DB_USERNAME = "postgres"
 DB_PASSWORD = secrets.DB_PASSWORD
 DB_PATH = "localhost"
-DB_DATABASE_NAME = "coursilium"
+DB_DATABASE_NAME = "coursemanager"
 
 
 # Config for Flask-WTF Recaptcha necessary for user registration
@@ -41,3 +41,16 @@ MAIL_PORT = 587
 MAIL_USERNAME = 'coursilium@gmail.com'
 MAIL_PASSWORD = secrets.MAIL_PASSWORD
 MAIL_DEFAULT_SENDER = ("Coursilium Registration", 'coursilium+registration@gmail.com')
+
+# CSRF protection is critical for all session-based browser UIs
+
+# enforce CSRF protection for session / browser - but allow token-based
+# API calls to go through
+SECURITY_CSRF_PROTECT_MECHANISMS = ["session", "basic"]
+SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS = True
+
+# Send Cookie with csrf-token. This is the default for Axios and Angular.
+SECURITY_CSRF_COOKIE_NAME = "XSRF-TOKEN"
+WTF_CSRF_CHECK_DEFAULT = False
+WTF_CSRF_TIME_LIMIT = None
+
