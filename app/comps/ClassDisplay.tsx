@@ -49,9 +49,34 @@ function human_time(mil_time: string) {
 }
 
 
-export default function ClassDisplay(props: { sectionData: SectionData, scheduleManager: { addClass: Function, removeClass: Function, checkClass: Function, checkConflicts: Function } }) {
+export interface ClassDisplayInfo {
+  classNumber: number;
+  term: string;
+  course: {
+    code: string;
+    description: string;
+  }
+  classSection: string;
+  title: string;
+  enrollmentTotal: number;
+  enrollmentCap: number;
+  lastUpdatedAt: Date;
+  schedules: Array<{
+    location: string;
+    instructors: Array<{
+      name: string;
+    }>
+    days: string;
+    startTime: number;
+    endTime: number;
+  }>
+  hours: number;
+}
+
+
+export default function ClassDisplay(props: { classInfo: ClassDisplayInfo, scheduleManager: { addClass: Function, removeClass: Function, checkClass: Function, checkConflicts: Function } }) {
   const [expanded, setExpanded] = React.useState(false);
-  const [inSchedule, setInSchedule] = React.useState(props.scheduleManager.checkClass(props.sectionData));
+  const [inSchedule, setInSchedule] = React.useState(props.scheduleManager.checkClass(props.classInfo));
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -60,59 +85,65 @@ export default function ClassDisplay(props: { sectionData: SectionData, schedule
   const handleAddClick = () => {
     setInSchedule(!inSchedule);
     if (!inSchedule) {
-      props.scheduleManager.addClass(props.sectionData);
+      props.scheduleManager.addClass(props.classInfo);
     } else {
-      props.scheduleManager.removeClass(props.sectionData);
+      props.scheduleManager.removeClass(props.classInfo);
     }
   }
 
   return (
-    <Card key={props.sectionData.class_number} className="classDisplay" sx={{ width: 300 }}>
+    <Card className="classDisplay" sx={{ width: 300 }}>
       <CardHeader
-        title={props.sectionData.course_code + "-" + props.sectionData.section_code}
-        subheader={props.sectionData.title}
+        title={props.classInfo.course.code + "-" + props.classInfo.classSection}
+        subheader={props.classInfo.title}
         action={
           <Container disableGutters>
-            { props.scheduleManager.checkConflicts(props.sectionData) ? <Tooltip title="Conflicts with your schedule">
+            { props.scheduleManager.checkConflicts(props.classInfo.schedules) ? <Tooltip title="Conflicts with your schedule">
               <WarningIcon color='warning'/>
             </Tooltip> : null}
             
 
-            { props.sectionData.enrollment_total==props.sectionData.enrollment_cap ? 
-            <Tooltip title={"Full as of " + props.sectionData.last_updated_at.toLocaleString()}>
+            { props.classInfo.enrollmentTotal==props.classInfo.enrollmentCap ? 
+            <Tooltip title={"Full as of " + props.classInfo.lastUpdatedAt.toLocaleString()}>
               <ReportIcon  color='error'/>
             </Tooltip> : null }
           </Container>}
       />
       <CardContent>
-        {props.sectionData.schedules.map(schedule => {
+        {props.classInfo.schedules.map(schedule => {
           return (
             <>
-              <Typography variant="body1" color="text.secondary">{schedule.days} {human_time(schedule.time)}</Typography>
-              <Typography variant="body1" color="text.secondary">{schedule.instructors}</Typography>
+              <Typography variant="body1" color="text.secondary" key={schedule.days + schedule.startTime}>
+                {schedule.days} {
+                (Math.floor(schedule.startTime / 60) + 1) % 12 + 1}:{schedule.startTime%60} {schedule.startTime >= 13*60 ? "PM" : "AM"} - {
+                (Math.floor(schedule.endTime / 60) + 1) % 12 + 1}:{schedule.endTime%60} {schedule.endTime >= 13*60 ? "PM" : "AM"}
+              </Typography>
+              {schedule.instructors.map(instructor => {
+                <Typography variant="body1" color="text.secondary">{instructor.name}</Typography>
+              })}
             </>
           )
         }
         )}
-        <Typography variant="body2" color="text.secondary">{props.sectionData.credits} credit hours</Typography>
+        <Typography variant="body2" color="text.secondary">{props.classInfo.hours} credit hours</Typography>
       </CardContent>
       <CardActions disableSpacing>
-        <IconButton aria-label="add to schedule" onClick={handleAddClick}>
+        <IconButton aria-label="Add to schedule" onClick={handleAddClick}>
           {inSchedule ? <RemoveIcon /> : <AddIcon />}
         </IconButton>
         <ExpandMore
           expand={expanded}
           onClick={handleExpandClick}
           aria-expanded={expanded}
-          aria-label="show more"
+          aria-label="Show more"
         >
           <ExpandMoreIcon />
         </ExpandMore>
       </CardActions>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
-          <Typography variant="body1" color="text.secondary">{props.sectionData.description}</Typography>
-          <Typography variant="body2" color="text.secondary">Class Registration Number: {props.sectionData.class_number}</Typography>
+          <Typography variant="body1" color="text.secondary">{props.classInfo.course.description}</Typography>
+          <Typography variant="body2" color="text.secondary">Class Registration Number: {props.classInfo.classNumber}</Typography>
         </CardContent>
       </Collapse>
     </Card>
