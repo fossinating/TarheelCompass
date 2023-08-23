@@ -1,10 +1,9 @@
 import { OperationVariables, QueryOptions, QueryResult, useQuery } from "@apollo/client";
 import { createContext, ReactElement, useEffect, useState } from "react";
 import { gql } from "../src/__generated__";
-import { GetCachedClassesQuery, GetCachedCoursesQuery, GetClassesQuery } from "../src/__generated__/graphql";
+import { GetCachedClassesQuery, GetClassesQuery } from "../src/__generated__/graphql";
 import { SectionData } from "./Common";
 
-let class_cache_instance: ClassCache;
 export type CachedClass = { __typename?: 'Class', classNumber: number, classSection: string, combinedSectionId?: string | null, component?: string | null, enrollmentCap?: number | null, enrollmentTotal?: number | null, equivalents?: string | null, hours: number, instructionType?: string | null, meetingDates?: string | null, term: string, waitlistCap?: number | null, waitlistTotal?: number | null, course: { __typename?: 'Course', code: string, credits: string, description?: string | null, title: string, attrs: Array<{ __typename?: 'CourseAttribute', label: string, value: string }> }, schedules: Array<{ __typename?: 'ClassSchedule', days: string, endTime: number, startTime: number, location: string, instructors: Array<{ __typename?: 'Instructor', instructorType: string, name: string }> }> }
 enum CacheState {
     Loading = 1,
@@ -13,105 +12,26 @@ enum CacheState {
 }
 //let [savedClasses, setSavedClasses] = useState<Map<number, {data: GetCachedCoursesQuery, ref_ids: Array<string>}>>(new Map);
 
-class ClassCache {
-    saved_classes: Map<number, {data: GetCachedCoursesQuery, ref_ids: Array<string>}> = new Map;
-
-    getClass(class_number: number, from_schedule: string) {
-        if (this.saved_classes.has(class_number)) {
-            if (!(this.saved_classes.get(class_number) as {ref_ids: Array<string>}).ref_ids.includes(from_schedule)) {
-                (this.saved_classes.get(class_number) as {ref_ids: Array<string>}).ref_ids.push(from_schedule)
-            }
-            return (this.saved_classes.get(class_number))
-        } else {
-            let query = gql(`
-            query GetCachedClasses($term: String!, $numbers: [Int!]) {
-                classes(term: $term, classNumbers: $numbers) {
-                    classNumber,
-                    classSection,
-                    combinedSectionId,
-                    component,
-                    course {
-                        attrs {
-                            label,
-                            value
-                        },
-                        code,
-                        credits,
-                        description,
-                        title
-                    },
-                    enrollmentCap,
-                    enrollmentTotal,
-                    equivalents,
-                    hours,
-                    instructionType,
-                    meetingDates,
-                    schedules {
-                        days,
-                        endTime,
-                        startTime,
-                        location,
-                        instructors {
-                            instructorType,
-                            name
-                        }
-                    },
-                    term,
-                    waitlistCap,
-                    waitlistTotal
-                }
-            }
-
-            `)
-            this.saved_classes.set(class_number, {data: useQuery(query), ref_ids: [from_schedule]})
-        }
-    }
-
-    tryLoad() {
-        if (status < CacheState.Cached && typeof window !== 'undefined') {
-            const stored = localStorage.getItem("class_cache");
-            this.saved_classes = stored ? JSON.parse(stored) : [];
-            setStatus(CacheState.Cached)
-        }
-    }
-
-    constructor() {
-        if (class_cache_instance) {
-            throw new Error("Singleton !")
-        }
-        this.tryLoad();
-        class_cache_instance = this;
-    }
-}
-
-function getClassCache(): ClassCache {
-    if (class_cache_instance) {
-        return class_cache_instance;
-    }
-    return new ClassCache();
-}
-
 export class Schedule {
     id: string;
     name: string;
     term: string;
     class_numbers: Array<number>;
-    //condensed_schedules: Array<Array<ScheduleBlock>> = [];
+    setClassNumbers: Function;
 
     constructor(id: string, name: string, term: string, class_numbers: Array<number>) {
         this.id = id;
         this.name = name;
         this.term = term;
-        this.class_numbers = class_numbers;
+        [this.class_numbers, this.setClassNumbers] = useState(class_numbers);
     }
 
     addClass(class_data: {class_number: number}): void {
-        this.class_numbers = [ ...this.class_numbers, class_data.class_number]
-        getClassCache().
+        this.setClassNumbers([ ...this.class_numbers, class_data.class_number]);
         localStorage.setItem("class_numbers", JSON.stringify(this.class_numbers));
     }
     removeClass(class_data: {class_number: number}): void {
-        this.class_numbers = this.class_numbers.filter(e => e !== class_data.class_number);
+        this.setClassNumbers(this.class_numbers.filter(e => e !== class_data.class_number));
         localStorage.setItem("class_numbers", JSON.stringify(this.class_numbers));
     }
 
@@ -186,7 +106,7 @@ class StateObject<T> {
     }
 }
 
-const ScheduleManagerContext = createContext<ScheduleManager>(getScheduleManager());
+const ScheduleManagerContext = createContext<ScheduleManager | null>(null);
 
 export function ScheduleProvider(props: {children: ReactElement}) {
     let [status, setStatus] = useState<CacheState>(CacheState.Loading);
@@ -294,7 +214,7 @@ export function ScheduleProvider(props: {children: ReactElement}) {
                     classRequests.push(data);
             });
         }
-    }, [schedules])
+    }, [schedules, schedules?.map(({class_numbers}) => class_numbers)])
 
     useEffect(() => {
         let done = true;
@@ -312,41 +232,25 @@ export function ScheduleProvider(props: {children: ReactElement}) {
         }
     }, classRequests);
 
+
+
     return (
         <>
-            <ScheduleManagerContext.Provider value={getScheduleManager()}>
+            <ScheduleManagerContext.Provider value={new ScheduleManager(status, cachedClasses, schedules)}>
                 {props.children}
             </ScheduleManagerContext.Provider>
         </>
     );
 }
 
-let instance: ScheduleManager;
-
 export class ScheduleManager {
-    schedules: Array<Schedule> = [];
-    loaded = false;
+    status: CacheState;
+    cachedClasses: Map<ClassID, StateObject<CachedClass>>;
+    schedules: Array<Schedule> | undefined;
 
-    tryLoad() {
-        if (!this.loaded && typeof window !== 'undefined') {
-            const stored = localStorage.getItem("schedules");
-            this.schedules = stored ? JSON.parse(stored) : [];
-            this.loaded = true;
-        }
+    constructor(status: CacheState, cachedClasses: Map<ClassID, StateObject<CachedClass>>, schedules: Array<Schedule> | undefined) {
+        this.status = status;
+        this.cachedClasses = cachedClasses;
+        this.schedules = schedules;
     }
-
-    constructor() {
-        if (instance) {
-            throw new Error("Singleton !")
-        }
-        this.tryLoad();
-        instance = this;
-    }
-}
-
-export default function getScheduleManager(): ScheduleManager {
-    if (instance) {
-        return instance;
-    }
-    return new ScheduleManager();
 }
