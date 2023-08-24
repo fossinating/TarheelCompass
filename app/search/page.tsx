@@ -7,7 +7,7 @@ import { SectionData } from "../Common";
 import { useState, useRef, useEffect } from "react";
 import React from "react";
 import CloseIcon from '@mui/icons-material/Close';
-import getScheduleManager, { ScheduleManager } from "../scheduleManager";
+import { ScheduleProvider } from "../scheduleManager";
 import { useLazyQuery, useQuery } from "@apollo/client";
 import { gql } from "../../src/__generated__";
 
@@ -92,71 +92,6 @@ export default function Page() {
 
   let class_numbers: Array<number> = [];
 
-  const setMessage = (message: string) => {
-    setSnackPack((prev) => [...prev, { message, key: new Date().getTime() }]);
-  };
-
-  let last_action: {add: boolean, section_data: SectionData}
-
-  let scheduleManager: ScheduleManager = getScheduleManager();
-
-  const scheduleMiddleman = {
-    addClass: (section_data: SectionData) => {
-      scheduleManager.addClass(section_data);
-      setMessage(section_data.course_code + "-" + section_data.section_code + " added to schedule");
-      last_action = {add:true, section_data:section_data}
-    },
-    removeClass: (section_data: SectionData) => {
-      scheduleManager.removeClass(section_data);
-      setMessage(section_data.course_code + "-" + section_data.section_code + " removed from schedule");
-      last_action = {add:false, section_data:section_data}
-    },
-    checkClass: (section_data: SectionData) => {
-      return scheduleManager.checkClass(section_data);
-    },
-    checkConflicts: (section_data: SectionData) => {
-      return scheduleManager.hasConflicts(section_data);
-    }
-  }
-  const [snackPack, setSnackPack] = React.useState<readonly SnackbarMessage[]>([]);
-  const [open, setOpen] = React.useState(false);
-  const [messageInfo, setMessageInfo] = React.useState<SnackbarMessage | undefined>(
-    undefined,
-  );
-
-  React.useEffect(() => {
-    if (snackPack.length && !messageInfo) {
-      // Set a new snack when we don't have an active one
-      setMessageInfo({ ...snackPack[0] });
-      setSnackPack((prev) => prev.slice(1));
-      setOpen(true);
-    } else if (snackPack.length && messageInfo && open) {
-      // Close an active snack when a new one is added
-      setOpen(false);
-    }
-  }, [snackPack, messageInfo, open]);
-
-  const handleUndo = () => {
-    if (last_action.add) {
-      scheduleMiddleman.removeClass(last_action.section_data);
-    } else {
-      scheduleMiddleman.addClass(last_action.section_data);
-    }
-    setOpen(false);
-  }
-
-  const handleClose = (event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpen(false);
-  };
-
-  const handleExited = () => {
-    setMessageInfo(undefined);
-  };
-
-
   return (
       <>
       <Grid container spacing={2}>
@@ -195,33 +130,10 @@ export default function Page() {
       </Grid>
       <Container id="resultsContainer">
         { data ? data.classes.map((item) =>
-          <ClassDisplay key={item.classNumber} classInfo={item} scheduleManager={scheduleMiddleman}></ClassDisplay>
+          <ClassDisplay key={item.classNumber} classInfo={item}></ClassDisplay>
         ) : null }
         
       </Container>
-      <Snackbar
-        key={messageInfo ? messageInfo.key : undefined}
-        open={open}
-        autoHideDuration={6000}
-        onClose={handleClose}
-        TransitionProps={{ onExited: handleExited }}
-        message={messageInfo ? messageInfo.message : undefined}
-        action={
-          <React.Fragment>
-            <Button color="secondary" size="small" onClick={handleClose}>
-              UNDO
-            </Button>
-            <IconButton
-              aria-label="close"
-              color="inherit"
-              sx={{ p: 0.5 }}
-              onClick={handleUndo}
-            >
-              <CloseIcon />
-            </IconButton>
-          </React.Fragment>
-        }
-      />
       </>
     );
 }

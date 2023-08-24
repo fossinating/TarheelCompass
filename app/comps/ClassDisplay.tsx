@@ -14,6 +14,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import WarningIcon from '@mui/icons-material/Warning';
 import { Container, Tooltip } from '@mui/material';
 import ReportIcon from '@mui/icons-material/Report';
+import { ScheduleProvider } from '../scheduleManager';
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -54,12 +55,12 @@ export interface ClassDisplayInfo {
   term: string;
   course: {
     code: string;
-    description: string;
+    description?: string | null | undefined;
   }
   classSection: string;
   title: string;
-  enrollmentTotal: number;
-  enrollmentCap: number;
+  enrollmentTotal?: number | null | undefined;
+  enrollmentCap?: number | null | undefined;
   lastUpdatedAt: Date;
   schedules: Array<{
     location: string;
@@ -74,9 +75,10 @@ export interface ClassDisplayInfo {
 }
 
 
-export default function ClassDisplay(props: { classInfo: ClassDisplayInfo, scheduleManager: { addClass: Function, removeClass: Function, checkClass: Function, checkConflicts: Function } }) {
+export default function ClassDisplay(props: { classInfo: ClassDisplayInfo }) {
   const [expanded, setExpanded] = React.useState(false);
-  const [inSchedule, setInSchedule] = React.useState(props.scheduleManager.checkClass(props.classInfo));
+  const scheduleManager = React.useContext(ScheduleManagerContext);
+  const [inSchedule, setInSchedule] = React.useState();
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
