@@ -1,7 +1,7 @@
 'use client';
 import { AppBar, Unstable_Grid2 as Grid, TextField, Button, Container, MenuItem, FormControl, InputLabel, Snackbar, IconButton } from "@mui/material";
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import ClassDisplay from "../comps/ClassDisplay";
+import ClassDisplay from "../lib/ClassDisplay";
 import "./Search.css";
 import { SectionData } from "../Common";
 import { useState, useRef, useEffect } from "react";

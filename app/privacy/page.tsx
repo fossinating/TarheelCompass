@@ -1,6 +1,6 @@
 "use client";
 import { List, ListItem, Typography, Container, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
-import Link from "../comps/Link";
+import Link from "../lib/Link";
 
 const privacy_global_version = 1;
 const privacy_account_version = 1;

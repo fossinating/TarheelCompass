@@ -1,6 +1,6 @@
 "use client";
 import { List, ListItem, Typography, Container } from "@mui/material";
-import Link from "../comps/Link";
+import Link from "../lib/Link";
 
 const terms_version = 1;
 

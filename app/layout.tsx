@@ -1,7 +1,7 @@
 'use client'
 import './Layout.css';
 import * as React from 'react';
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
@@ -16,13 +16,16 @@ import ListItemText from '@mui/material/ListItemText';
 import CalendarViewWeekIcon from '@mui/icons-material/CalendarViewWeek';
 import SearchIcon from '@mui/icons-material/Search';
 import { LinkProps } from 'next/link';
-import Link from "./comps/Link";
+import Link from "./lib/Link";
 import { usePathname } from 'next/navigation';
-import AccountMenu from './comps/AccountMenu';
+import AccountMenu from './lib/AccountMenu';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { SessionProvider } from 'next-auth/react';
-import {ApolloClient, InMemoryCache, ApolloProvider} from '@apollo/client';
+import {ApolloClient, InMemoryCache, ApolloProvider, NormalizedCacheObject} from '@apollo/client';
+import { persistCache, LocalStorageWrapper, CachePersistor } from 'apollo3-cache-persist';
 import { ScheduleProvider } from './scheduleManager';
+import { useEffect, useState } from 'react';
+import { Providers } from './lib/Providers';
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
   open?: boolean;
@@ -109,20 +112,11 @@ export default function Layout({
   children: React.ReactNode
 }) {
 
-  const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-
+  
   const handleDrawerToggle = () => {
     setOpen(!open);
   };
-
-  const client = new ApolloClient({
-
-    uri: 'http://132.145.143.61/graphql',
-  
-    cache: new InMemoryCache(),
-  
-  });
 
   return (
     <html lang="en">
@@ -130,38 +124,32 @@ export default function Layout({
         <title>Course Manager</title>
       </head>
       <body>
-        <ScheduleProvider>
-          <SessionProvider>
-            <ApolloProvider client={client}>
-              <ThemeProvider theme={theme}>
-                <CssBaseline />
-                <Box id="layoutContainer">
-                  <AppBar id="headerBar" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-                    <Toolbar>
-                      <IconButton
-                      color="inherit"
-                      aria-label="open drawer"
-                      onClick={handleDrawerToggle}
-                      edge="start"
-                      sx={{ mr: 2 }}
-                      >
-                      <MenuIcon />
-                      </IconButton>
-                      <Typography variant="h6" noWrap component="div">
-                      Course Manager
-                      </Typography>
-                      <AccountMenu />
-                    </Toolbar>
-                  </AppBar>
-                  <NavDrawer open={open} />
-                  <Main id="mainContainer" open={open}>
-                    {children}
-                  </Main>
-                </Box>
-              </ThemeProvider>
-            </ApolloProvider>
-          </SessionProvider>
-        </ScheduleProvider>
+        <Providers>
+          <CssBaseline />
+            <Box id="layoutContainer">
+              <AppBar id="headerBar" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+                <Toolbar>
+                  <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  onClick={handleDrawerToggle}
+                  edge="start"
+                  sx={{ mr: 2 }}
+                  >
+                  <MenuIcon />
+                  </IconButton>
+                  <Typography variant="h6" noWrap component="div">
+                  Course Manager
+                  </Typography>
+                  <AccountMenu />
+                </Toolbar>
+              </AppBar>
+              <NavDrawer open={open} />
+              <Main id="mainContainer" open={open}>
+                {children}
+              </Main>
+            </Box>
+        </Providers>
       </body>
     </html>
   );
