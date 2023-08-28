@@ -4,8 +4,8 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 /* Instruments */
 import { incrementAsync } from './thunks'
 
-const initialState: CounterSliceState = {
-  value: 0,
+const initialState: SchedulesSliceState = {
+  value: [],
   status: 'idle',
 }
 
@@ -45,6 +45,6 @@ export const counterSlice = createSlice({
 
 /* Types */
 export interface CounterSliceState {
-  value: number
+  value: Array<Schedules>
   status: 'idle' | 'loading' | 'failed'
 }
