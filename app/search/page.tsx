@@ -59,7 +59,7 @@ export default function Page() {
     GET_CLASSES,{ variables: {term: term as string, code: codeRef.current?.value as string} });
 
   useEffect( () => {
-    fetch("http://132.145.143.61:80/terms", {
+    fetch("http://api.tarheelcompass.com/terms", {
       method: "GET",
       headers: {
         'content-type': 'application/json;charset=UTF-8',
