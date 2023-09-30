@@ -1,0 +1,29 @@
+/* Instruments */
+import { createAppAsyncThunk } from '@/lib/redux/createAppAsyncThunk'
+import { fetchSchedules } from './fetchSchedules'
+import { SystemData } from './systemSlice'
+
+// The function below is called a thunk and allows us to perform async logic. It
+// can be dispatched like a regular action: `dispatch(incrementAsync(10))`. This
+// will call the thunk with the `dispatch` function as the first argument. Async
+// code can then be executed and other actions can be dispatched. Thunks are
+// typically used to make async requests.
+export const updateSchedules = createAppAsyncThunk(
+  'schedules/update',
+  async () => {
+    const response = await fetchSchedules()
+
+    // The value we return becomes the `fulfilled` action payload
+    return response.data
+  }
+)
+
+export const loadData = createAppAsyncThunk(
+  "system/load",
+  async () => {
+    const storedData = window.localStorage.getItem("systemData");
+    if (storedData != null) {
+      return JSON.parse(storedData) as SystemData;
+    }
+  }
+)

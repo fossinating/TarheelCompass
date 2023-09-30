@@ -4,13 +4,13 @@
 import { Provider } from 'react-redux'
 
 /* Instruments */
-import { reduxStore } from '@/lib/redux'
 import { SessionProvider } from 'next-auth/react'
 import { ScheduleProvider } from '../scheduleManager'
 import { ApolloClient, ApolloProvider, InMemoryCache, NormalizedCacheObject } from '@apollo/client'
 import { ThemeProvider, useTheme } from '@emotion/react'
 import { CachePersistor, LocalStorageWrapper } from 'apollo3-cache-persist'
 import { useState, useEffect } from 'react'
+import { reduxStore } from './redux'
 
 export const Providers = (props: React.PropsWithChildren) => {
 
@@ -40,20 +40,18 @@ export const Providers = (props: React.PropsWithChildren) => {
     
   const theme = useTheme();
 
-    if (!client) {
-      return <h2>Initializing app...</h2>;
-    }
+  if (!client) {
+    return <h2>Initializing app...</h2>;
+  }
   return (
     <Provider store={reduxStore}>
-        <ScheduleProvider>
-            <SessionProvider>
-                <ApolloProvider client={client}>
-                    <ThemeProvider theme={theme}>
-                        {props.children}
-                    </ThemeProvider>
-                </ApolloProvider>
-            </SessionProvider>
-        </ScheduleProvider>
+      <SessionProvider>
+          <ApolloProvider client={client}>
+            <ThemeProvider theme={theme}>
+                {props.children}
+            </ThemeProvider>
+          </ApolloProvider>
+      </SessionProvider>
     </Provider>
   )
 }

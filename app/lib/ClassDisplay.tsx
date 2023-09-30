@@ -9,12 +9,12 @@ import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import AddIcon from '@mui/icons-material/Add';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { SectionData } from '../Common';
 import RemoveIcon from '@mui/icons-material/Remove';
 import WarningIcon from '@mui/icons-material/Warning';
 import { Container, Tooltip } from '@mui/material';
 import ReportIcon from '@mui/icons-material/Report';
-import { ScheduleProvider, ScheduleManagerContext } from '../scheduleManager';
+import { useSelector, useStore } from 'react-redux';
+import { selectCurrentScheduleIndex, selectSchedules, systemSlice } from './redux';
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -77,8 +77,19 @@ export interface ClassDisplayInfo {
 
 export default function ClassDisplay(props: { classInfo: ClassDisplayInfo }) {
   const [expanded, setExpanded] = React.useState(false);
-  const scheduleManager = React.useContext(ScheduleManagerContext);
-  const [inSchedule, setInSchedule] = React.useState();
+  const [inSchedule, setInSchedule] = React.useState(false);
+  const schedules = useSelector(selectSchedules);
+  const currentScheduleIndex = useSelector(selectCurrentScheduleIndex);
+
+  const [hasConflict, setHasConflict] = React.useState(false);
+
+  React.useEffect(() => {
+    if (inSchedule) {
+      setHasConflict(false);
+    }
+
+    
+  }, [inSchedule, schedules, currentScheduleIndex])
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -87,9 +98,9 @@ export default function ClassDisplay(props: { classInfo: ClassDisplayInfo }) {
   const handleAddClick = () => {
     setInSchedule(!inSchedule);
     if (!inSchedule) {
-      props.scheduleManager.addClass(props.classInfo);
+      systemSlice.actions.addClass(props.classInfo.classNumber);
     } else {
-      props.scheduleManager.removeClass(props.classInfo);
+      systemSlice.actions.removeClass(props.classInfo.classNumber);
     }
   }
 
@@ -100,7 +111,7 @@ export default function ClassDisplay(props: { classInfo: ClassDisplayInfo }) {
         subheader={props.classInfo.title}
         action={
           <Container disableGutters>
-            { props.scheduleManager.checkConflicts(props.classInfo.schedules) ? <Tooltip title="Conflicts with your schedule">
+            { hasConflict ? <Tooltip title="Conflicts with your schedule">
               <WarningIcon color='warning'/>
             </Tooltip> : null}
             

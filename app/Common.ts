@@ -5,7 +5,7 @@ export class SectionData {
     section_code: string;
     title: string;
     description: string;
-    schedules: Schedule[];
+    schedules: ClassSchedule[];
     class_number: number;
     component: string;
     term: string;
@@ -21,7 +21,7 @@ export class SectionData {
     last_updated_from: string;
 
     constructor(
-        course_code: string, section_code: string, title: string, description: string, schedules: Schedule[], class_number: number, component: string, term: string, 
+        course_code: string, section_code: string, title: string, description: string, schedules: ClassSchedule[], class_number: number, component: string, term: string, 
         credits: number, instruction_type: string, enrollment_cap: number, enrollment_total: number, waitlist_cap: number, waitlist_total: number, min_enrollment: number, 
         attributes: {[key: string]: string}, last_updated_at: Date, last_updated_from: string) {
         this.course_code = course_code;
@@ -46,7 +46,7 @@ export class SectionData {
     }
 }
 
-export class Schedule {
+export class ClassSchedule {
     instructors: string[];
     days: string;
     time: string;
