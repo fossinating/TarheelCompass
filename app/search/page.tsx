@@ -59,7 +59,7 @@ export default function Page() {
     GET_CLASSES,{ variables: {term: term as string, code: codeRef.current?.value as string} });
 
   useEffect( () => {
-    fetch("http://api.tarheelcompass.com/terms", {
+    fetch("https://api.tarheelcompass.com/terms", {
       method: "GET",
       headers: {
         'content-type': 'application/json;charset=UTF-8',
@@ -115,7 +115,7 @@ export default function Page() {
               >
                 {term != null ? 
                   terms.map((term) =>
-                    <MenuItem value={term.id}>{term.name}</MenuItem>
+                    <MenuItem key={term.id} value={term.id}>{term.name}</MenuItem>
                   )
                   : <MenuItem value="Loading">Loading</MenuItem>
                 }

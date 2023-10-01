@@ -23,7 +23,10 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token, user }) {
       // Send properties to the client, like an access_token and user id from a provider.
       //console.log("\nsession", session, "\nuser", user)
-      
+      if (session && session.user) {
+        session.user.id = user.id;
+      }
+
       return session
     }
   },

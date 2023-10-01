@@ -17,13 +17,3 @@ export const updateSchedules = createAppAsyncThunk(
     return response.data
   }
 )
-
-export const loadData = createAppAsyncThunk(
-  "system/load",
-  async () => {
-    const storedData = window.localStorage.getItem("systemData");
-    if (storedData != null) {
-      return JSON.parse(storedData) as SystemData;
-    }
-  }
-)

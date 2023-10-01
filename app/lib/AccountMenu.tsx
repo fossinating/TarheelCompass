@@ -25,7 +25,7 @@ export default function AccountMenu() {
     setAnchorEl(null);
   };
   const session = useSession();
-  console.log(session)
+  //console.log(session)
   const [terms, _setTerms] = useLocalStorage("terms", false);
   const [localSchedules, _setLocalSchedules] = useLocalStorage("local_schedules", null);
 
