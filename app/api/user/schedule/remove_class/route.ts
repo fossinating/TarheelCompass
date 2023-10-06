@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "../../../auth/[...nextauth]/route"
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/Prisma';
  
 export async function POST(req: NextRequest) {
     const session = await getServerSession(authOptions)
     if (session && session?.user) {
         let data: {schedule_id: string, class_number: number} = await req.json();
-        const prisma = new PrismaClient()
         // use `prisma` in your application to read and write data in your DB
     
         const schedule = await prisma.schedule.findFirst({

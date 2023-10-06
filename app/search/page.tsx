@@ -3,7 +3,7 @@ import { AppBar, Unstable_Grid2 as Grid, TextField, Button, Container, MenuItem,
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import ClassDisplay from "../lib/ClassDisplay";
 import "./Search.css";
-import { SectionData } from "../Common";
+import { SectionData, useTerms } from "../lib/Common";
 import { useState, useRef, useEffect } from "react";
 import React from "react";
 import CloseIcon from '@mui/icons-material/Close';
@@ -16,18 +16,11 @@ export interface SnackbarMessage {
   key: number;
 }
 
-interface TermData {
-  id: string;
-  name: string;
-  default?: boolean;
-}
-
 export default function Page() {
   const [items, setItems] = useState<SectionData[]>([]);
   const codeRef = useRef<HTMLInputElement | null>(null);
   const creditsRef = useRef<HTMLInputElement | null>(null);
-  const [terms, setTerms] = useState<TermData[]>([]);
-  const [term, setTerm] = useState<string | null>(null);
+  const [terms, term, setTerm] = useTerms();
   const GET_CLASSES = gql(`
     query GetClasses($term: String!, $code: String!) {
       classes(term: $term, courseId: $code) {
@@ -58,34 +51,6 @@ export default function Page() {
   const [ loadClasses, {called, loading, data} ] = useLazyQuery(
     GET_CLASSES,{ variables: {term: term as string, code: codeRef.current?.value as string} });
 
-  useEffect( () => {
-    fetch("https://api.tarheelcompass.com/terms", {
-      method: "GET",
-      headers: {
-        'content-type': 'application/json;charset=UTF-8',
-      }
-    }).then(
-      res => res.json()
-    ).then(
-      (result: TermData[]) => {
-        setTerms(result);
-        result.forEach(element => {
-          if (element.default) {
-            setTerm(element.id);
-            return;
-          }
-        });
-        setTerm(result[0].id);
-      },
-      // Note: it's important to handle errors here
-      // instead of a catch() block so that we don't swallow
-      // exceptions from actual bugs in components.
-      (error) => {
-        console.log(error);
-      }
-    )
-  }, []);
-
   const handleChange = (event: SelectChangeEvent) => {
     setTerm(event.target.value as string);
   };
@@ -113,7 +78,7 @@ export default function Page() {
                 value = {term != null ? term : "Loading"}
                 disabled = {term == null}
               >
-                {term != null ? 
+                {terms.length > 0 ? 
                   terms.map((term) =>
                     <MenuItem key={term.id} value={term.id}>{term.name}</MenuItem>
                   )

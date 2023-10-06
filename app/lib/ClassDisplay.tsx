@@ -11,10 +11,23 @@ import AddIcon from '@mui/icons-material/Add';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import RemoveIcon from '@mui/icons-material/Remove';
 import WarningIcon from '@mui/icons-material/Warning';
-import { Container, Tooltip } from '@mui/material';
+import { CircularProgress, Container, Divider, ListItemIcon, ListItemText, Menu, MenuItem, SelectChangeEvent, Tooltip } from '@mui/material';
 import ReportIcon from '@mui/icons-material/Report';
-import { useSelector, useStore } from 'react-redux';
-import { selectCurrentScheduleIndex, selectSchedules, systemSlice } from './redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
+import { addClass, removeClass, Schedule, selectCurrentScheduleIndex, selectSchedules, systemSlice } from './redux';
+import Login from '@mui/icons-material/Login';
+import Logout from '@mui/icons-material/Logout';
+import Settings from '@mui/icons-material/Settings';
+import { signOut, signIn } from 'next-auth/react';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CheckCircle from '@mui/icons-material/CheckCircle';
+import Add from '@mui/icons-material/Add';
+import ErrorIcon from '@mui/icons-material/Error';
+import { gql } from 'src/__generated__';
+import { useQuery } from '@apollo/client';
+import { bool } from 'prop-types';
+import CreateScheduleDialog from './CreateScheduleDialog';
+import { scheduler } from 'timers/promises';
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -74,6 +87,92 @@ export interface ClassDisplayInfo {
   hours: number;
 }
 
+const GET_CLASSES_SCHEDULE_DATA = gql(`
+  query Classes($classNumbers: [Int!]!, $term: String!) {
+    classes(classNumbers: $classNumbers, term: $term) {
+      classNumber,
+      schedules {
+        days,
+        startTime,
+        endTime
+      }
+    }
+  }
+`);
+
+function ScheduleAdder(props: {classInfo: ClassDisplayInfo, schedule: Schedule, close: Function}) {
+  const [hasConflict, setHasConflict] = React.useState(false);
+  const [inSchedule, setInSchedule] = React.useState(false);
+  const dispatch = useDispatch();
+
+  const handleClick = () => {
+    if (inSchedule) {
+      dispatch(removeClass({classNumber: props.classInfo.classNumber, scheduleID: props.schedule.id}))
+    } else {
+      dispatch(addClass({classNumber: props.classInfo.classNumber, scheduleID: props.schedule.id}))
+    }
+  }
+
+  // I blame chatgpt if this doesnt work
+  const dayIndices: { [key: string]: number } = {
+    'M': 0,
+    'Tu': 1,
+    'W': 2,
+    'Th': 3,
+    'F': 4
+  };
+
+  const { loading, error, data } = useQuery(GET_CLASSES_SCHEDULE_DATA, {
+    variables: {classNumbers: props.schedule.classNumbers, term: props.classInfo.term}
+  });
+
+  React.useEffect(() => {
+    let foundSomething = false;
+    if (data) {
+      props.classInfo.schedules.forEach(blockSchedule => {
+        // Convert strings to sets of day indices
+        const blockDays = new Set(blockSchedule.days.split('').map(day => dayIndices[day]));
+        data.classes.forEach(element => {
+          if (element.classNumber === props.classInfo.classNumber) {
+            setInSchedule(true);
+            foundSomething = true;
+            return;
+          }
+          element.schedules.forEach(schedule => {
+            if ((blockSchedule.startTime >= schedule.startTime && schedule.startTime >= blockSchedule.endTime) || 
+                (blockSchedule.startTime >= schedule.endTime && schedule.endTime >= blockSchedule.endTime)) {
+              const scheduleDays = new Set(schedule.days.split('').map(day => dayIndices[day]));
+              if ([...blockDays].some(day => scheduleDays.has(day))) {
+                setHasConflict(true);
+                foundSomething = true;
+                return;
+              }
+            }
+          });
+        });
+      })
+    }
+    if (!foundSomething) {
+      setHasConflict(false);
+      setInSchedule(false);
+    }
+  }, [data])
+
+  return (
+  <MenuItem onClick={handleClick} key={props.schedule.id}>
+    <ListItemIcon>
+      { loading ? <CircularProgress /> :
+        error ? <Tooltip title="Failed to load class data for schedule"><ErrorIcon color='error'/></Tooltip> :
+        inSchedule ? <CheckCircle color="success" /> :
+        hasConflict ? <Tooltip title="Conflicts with schedule"><WarningIcon color='warning'/></Tooltip> :
+        <Add />
+      }
+    </ListItemIcon>
+    {props.schedule.name}
+  </MenuItem>
+  )
+}
+
 
 export default function ClassDisplay(props: { classInfo: ClassDisplayInfo }) {
   const [expanded, setExpanded] = React.useState(false);
@@ -83,25 +182,53 @@ export default function ClassDisplay(props: { classInfo: ClassDisplayInfo }) {
 
   const [hasConflict, setHasConflict] = React.useState(false);
 
+  const [schedulesInTerm, setSchedulesInTerm] = React.useState<Array<Schedule>>([]);
+
   React.useEffect(() => {
     if (inSchedule) {
       setHasConflict(false);
     }
 
-    
+    let inTerm: Array<Schedule> = [];
+
+    schedules.forEach(schedule => {
+      if (schedule.term === props.classInfo.term) {
+        inTerm.push(schedule)
+      }
+    });
+
+    setSchedulesInTerm(inTerm);
   }, [inSchedule, schedules, currentScheduleIndex])
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
-  const handleAddClick = () => {
+  /*const handleAddClick = () => {
     setInSchedule(!inSchedule);
     if (!inSchedule) {
-      systemSlice.actions.addClass(props.classInfo.classNumber);
+      systemSlice.actions.addClass({classNumber: props.classInfo.classNumber, scheduleID: schedules[currentScheduleIndex].id});
     } else {
-      systemSlice.actions.removeClass(props.classInfo.classNumber);
+      systemSlice.actions.removeClass({classNumber: props.classInfo.classNumber, scheduleID: schedules[currentScheduleIndex].id});
     }
+  }*/
+
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const addMenuOpen = Boolean(anchorEl);
+  const handleAddClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const [createScheduleOpen, setCreateScheduleOpen] = React.useState(false);
+  const handleCreateScheduleClick = () => {
+    setCreateScheduleOpen(true);
+  }
+
+  const handleCloseCreateScheduleDialog = () => {
+    setCreateScheduleOpen(false);
   }
 
   return (
@@ -132,7 +259,7 @@ export default function ClassDisplay(props: { classInfo: ClassDisplayInfo }) {
                 (Math.floor(schedule.endTime / 60) + 1) % 12 + 1}:{schedule.endTime%60} {schedule.endTime >= 13*60 ? "PM" : "AM"}
               </Typography>
               {schedule.instructors.map(instructor => {
-                <Typography variant="body1" color="text.secondary">{instructor.name}</Typography>
+                <Typography variant="body1" key={instructor.name} color="text.secondary">{instructor.name}</Typography>
               })}
             </>
           )
@@ -159,6 +286,59 @@ export default function ClassDisplay(props: { classInfo: ClassDisplayInfo }) {
           <Typography variant="body2" color="text.secondary">Class Registration Number: {props.classInfo.classNumber}</Typography>
         </CardContent>
       </Collapse>
+        <Menu
+          anchorEl={anchorEl}
+          id="account-menu"
+          open={addMenuOpen}
+          onClose={handleClose}
+          onClick={handleClose}
+          PaperProps={{
+            elevation: 0,
+            sx: {
+              overflow: 'visible',
+              filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+              mt: 1.5,
+              '& .MuiAvatar-root': {
+                width: 32,
+                height: 32,
+                ml: -0.5,
+                mr: 1,
+              },
+              '&:before': {
+                content: '""',
+                display: 'block',
+                position: 'absolute',
+                top: 0,
+                right: 14,
+                width: 10,
+                height: 10,
+                bgcolor: 'background.paper',
+                transform: 'translateY(-50%) rotate(45deg)',
+                zIndex: 0,
+              },
+            },
+          }}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        >
+          { schedulesInTerm.length > 0 ? schedules.map((schedule) => 
+            <ScheduleAdder key={schedule.id} schedule={schedule} classInfo={props.classInfo} close={handleClose} ></ScheduleAdder>
+          ) :
+            <MenuItem key="noSchedules" disabled>
+              No schedules for this term.
+            </MenuItem>
+            
+          }
+          {}
+          <Divider />
+          <MenuItem onClick={handleCreateScheduleClick}>
+            <ListItemIcon>
+              <Add fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Create new schedule</ListItemText>
+          </MenuItem>
+        </Menu>
+        <CreateScheduleDialog open={createScheduleOpen} onClose={handleCloseCreateScheduleDialog} />
     </Card>
   );
 }

@@ -31,20 +31,22 @@ export const systemSlice = createSlice({
   initialState: getInitialState(),
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
-    addClass: (state, action: PayloadAction<{class_number: number, schedule_id: string}>) => {
+    addClass: (state, action: PayloadAction<{classNumber: number, scheduleID: string}>) => {
       // Redux Toolkit allows us to write "mutating" logic in reducers. It
       // doesn't actually mutate the state because it uses the Immer library,
       // which detects changes to a "draft state" and produces a brand new
       // immutable state based off those changes
-      let schedule = state.schedules.find((schedule) => {schedule.id === action.payload.schedule_id});
+      let schedule = state.schedules.find((schedule) => schedule.id === action.payload.scheduleID);
       if (schedule) {
-        schedule.class_numbers.push(action.payload.class_number)
+        if (schedule.classNumbers.find((classNumber)=>classNumber === action.payload.classNumber) == undefined) {
+          schedule.classNumbers.push(action.payload.classNumber)
+        }
       }
     },
-    removeClass: (state, action: PayloadAction<{class_number: number, schedule_id: string}>) => {
-      let schedule = state.schedules.find((schedule) => {schedule.id === action.payload.schedule_id});
+    removeClass: (state, action: PayloadAction<{classNumber: number, scheduleID: string}>) => {
+      let schedule = state.schedules.find((schedule) => schedule.id === action.payload.scheduleID);
       if (schedule) {
-        schedule.class_numbers.filter(class_number => class_number != action.payload.class_number);
+        schedule.classNumbers = schedule.classNumbers.filter(class_number => class_number != action.payload.classNumber);
       }
     },
     // Use the PayloadAction type to declare the contents of `action.payload`
@@ -55,7 +57,7 @@ export const systemSlice = createSlice({
     },
     createSchedule: {
       reducer(state, action: PayloadAction<{term: string, id: string, name: string}>) {
-        state.schedules.push({class_numbers: [], term: action.payload.term, name: action.payload.name, id: action.payload.id})
+        state.schedules.push({classNumbers: [], term: action.payload.term, name: action.payload.name, id: action.payload.id})
       },
       prepare(term: string, name: string) {
         const id = uuidv4();
@@ -93,7 +95,7 @@ export const systemSlice = createSlice({
 export const {addClass, removeClass, changeCurrentSchedule, createSchedule, deleteSchedule, renameSchedule} = systemSlice.actions
 
 export interface Schedule {
-  class_numbers: Array<number>;
+  classNumbers: Array<number>;
   term: string;
   name: string;
   id: string;

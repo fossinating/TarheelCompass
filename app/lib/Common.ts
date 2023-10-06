@@ -1,4 +1,4 @@
-import internal from "stream";
+import { useState, useEffect, SetStateAction, Dispatch } from "react";
 
 export class SectionData {
     course_code: string;
@@ -58,4 +58,45 @@ export class ClassSchedule {
         this.time = time;
         this.location = location;
     }
+}
+
+interface TermData {
+  id: string;
+  name: string;
+  default?: boolean;
+}
+
+export function useTerms(): [TermData[], string|undefined, Dispatch<SetStateAction<string|undefined>>] {
+    const [terms, setTerms] = useState<TermData[]>([]);
+    const [term, setTerm] = useState<string | undefined>();
+
+    useEffect( () => {
+      fetch("https://api.tarheelcompass.com/terms", {
+        method: "GET",
+        headers: {
+          'content-type': 'application/json;charset=UTF-8',
+        }
+      }).then(
+        res => res.json()
+      ).then(
+        (result: TermData[]) => {
+          setTerms(result);
+          result.forEach(element => {
+            if (element.default) {
+              setTerm(element.id);
+              return;
+            }
+          });
+          setTerm(result[0].id);
+        },
+        // Note: it's important to handle errors here
+        // instead of a catch() block so that we don't swallow
+        // exceptions from actual bugs in components.
+        (error) => {
+          console.log(error);
+        }
+      )
+    }, []);
+
+    return [terms, term, setTerm];
 }

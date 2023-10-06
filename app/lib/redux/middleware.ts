@@ -70,8 +70,8 @@ const requestOptions = {
 
 listenerMiddleware.startListening({
   actionCreator: addClass,
-  effect: (action, listenerAPI) => {
-    const session = getSession();
+  effect: async (action, listenerAPI) => {
+    const session = await getSession();
     if (session !== null) {
       fetch(
         "/api/user/schedule/add_class",
@@ -85,8 +85,8 @@ listenerMiddleware.startListening({
 
 listenerMiddleware.startListening({
   actionCreator: removeClass,
-  effect: (action, listenerAPI) => {
-    const session = getSession();
+  effect: async (action, listenerAPI) => {
+    const session = await getSession();
     if (session !== null) {
       fetch(
         "/api/user/schedule/remove_class",
@@ -100,8 +100,9 @@ listenerMiddleware.startListening({
 
 listenerMiddleware.startListening({
   actionCreator: createSchedule,
-  effect: (action, listenerAPI) => {
-    const session = getSession();
+  effect: async (action, listenerAPI) => {
+    const session = await getSession();
+    console.log(session);
     if (session !== null) {
       fetch(
         "/api/user/schedule/create_schedule",
@@ -115,8 +116,8 @@ listenerMiddleware.startListening({
 
 listenerMiddleware.startListening({
   actionCreator: deleteSchedule,
-  effect: (action, listenerAPI) => {
-    const session = getSession();
+  effect: async (action, listenerAPI) => {
+    const session = await getSession();
     if (session !== null) {
       fetch(
         "/api/user/schedule/delete_schedule",
@@ -130,8 +131,8 @@ listenerMiddleware.startListening({
 
 listenerMiddleware.startListening({
   actionCreator: renameSchedule,
-  effect: (action, listenerAPI) => {
-    const session = getSession();
+  effect: async (action, listenerAPI) => {
+    const session = await getSession();
     if (session !== null) {
       fetch(
         "/api/user/schedule/rename_schedule",
