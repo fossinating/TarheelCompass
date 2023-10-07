@@ -1,0 +1,15 @@
+# API Endpoints
+
+- migrate endpoint
+
+# Interactions
+
+- Update schedules from server
+- Migration dialog
+  - Give option to migrate after a successful first login on device
+
+# Schedule Viewer
+- Basic outline
+- Schedule selector
+  - Delete/Rename Schedule
+  - View information about the schedule

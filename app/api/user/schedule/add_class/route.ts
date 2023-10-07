@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
         if (addClass === null) {
             return NextResponse.json({
                 errMessage: "Could not add class to schedule. Please try again later."
-            }, {status: 400})
+            }, {status: 500})
         }
 
         return NextResponse.json({ 

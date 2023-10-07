@@ -55,6 +55,8 @@ model ScheduledClass {
 model Schedule {
   id            String @id @unique
   ownerID       String
+  name          String
+  term          String
   classes       ScheduledClass[]
 
   owner User @relation(fields: [ownerID], references: [id])

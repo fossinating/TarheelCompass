@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
         if (removeClass === null) {
             return NextResponse.json({
                 errMessage: "Could not remove class from schedule. Please try again later."
-            }, {status: 400})
+            }, {status: 500})
         }
 
         return NextResponse.json({ 
