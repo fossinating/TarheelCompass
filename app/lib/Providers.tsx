@@ -1,7 +1,7 @@
 'use client'
 
 /* Core */
-import { Provider } from 'react-redux'
+import { Provider, useDispatch } from 'react-redux'
 
 /* Instruments */
 import { SessionProvider } from 'next-auth/react'
@@ -17,6 +17,7 @@ export const Providers = (props: React.PropsWithChildren) => {
     const [client, setClient] = useState<ApolloClient<NormalizedCacheObject>>();
   
     useEffect(() => {
+      // Set up graphql data
       async function init() {
         const cache = new InMemoryCache();
         let newPersistor = new CachePersistor({
@@ -46,11 +47,11 @@ export const Providers = (props: React.PropsWithChildren) => {
   return (
     <Provider store={reduxStore}>
       <SessionProvider>
-          <ApolloProvider client={client}>
-            <ThemeProvider theme={theme}>
-                {props.children}
-            </ThemeProvider>
-          </ApolloProvider>
+        <ApolloProvider client={client}>
+          <ThemeProvider theme={theme}>
+              {props.children}
+          </ThemeProvider>
+        </ApolloProvider>
       </SessionProvider>
     </Provider>
   )

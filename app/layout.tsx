@@ -2,6 +2,7 @@ import './Layout.css';
 import * as React from 'react';
 import { Providers } from './lib/Providers';
 import App from './app';
+import {AppSetup} from './lib/AppSetup';
 
 export default function Layout({
   children,
@@ -18,7 +19,9 @@ export default function Layout({
       </head>
       <body>
         <Providers>
-          <App>{children}</App>
+          <AppSetup>
+            <App>{children}</App>
+          </AppSetup>
         </Providers>
       </body>
     </html>

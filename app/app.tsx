@@ -21,7 +21,7 @@ import AccountMenu from './lib/AccountMenu';
 import { createTheme } from '@mui/material/styles';
 import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { updateSchedules, useDispatch } from './lib/redux';
+import { updateUserData, useDispatch } from './lib/redux';
 
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -121,7 +121,7 @@ export default function App({
     useEffect(() => {
         // Update schedules from stored version if user is logged in
         if (status === "authenticated") {
-            dispatch(updateSchedules());
+            dispatch(updateUserData());
         }
       }, [])
 

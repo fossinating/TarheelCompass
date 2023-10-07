@@ -60,7 +60,7 @@ export class ClassSchedule {
     }
 }
 
-interface TermData {
+export interface TermData {
   id: string;
   name: string;
   default?: boolean;
