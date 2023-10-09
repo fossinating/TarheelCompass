@@ -13,7 +13,8 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "\n  query Classes($classNumbers: [Int!]!, $term: String!) {\n    classes(classNumbers: $classNumbers, term: $term) {\n      classNumber,\n      schedules {\n        days,\n        startTime,\n        endTime\n      }\n    }\n  }\n": types.ClassesDocument,
+    "\n  query GetClassSchedules($class_numbers: [Int!]!, $term: String!) {\n    classes(classNumbers: $class_numbers, term: $term) {\n      classNumber,\n      schedules {\n        days,\n        startTime,\n        endTime\n      }\n    }\n  }\n": types.GetClassSchedulesDocument,
+    "\n  query GetScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {\n    classes(classNumbers: $class_numbers, term: $term) {\n      classNumber,\n      course {\n        code\n      },\n      classSection,\n      title,\n      schedules {\n        location,\n        instructors {\n          name\n        }\n        days,\n        startTime,\n        endTime\n      },\n      hours\n    }\n  }\n": types.GetScheduleDisplayClassesDocument,
     "\n    query GetClasses($term: String!, $code: String!) {\n      classes(term: $term, courseId: $code) {\n        term,\n        classNumber,\n        course {\n          code,\n          description\n        },\n        classSection,\n        title,\n        schedules {\n          location,\n          instructors {\n            name\n          }\n          days,\n          startTime,\n          endTime\n        },\n        enrollmentTotal,\n        enrollmentCap,\n        hours,\n        lastUpdatedAt\n      }\n    }\n  ": types.GetClassesDocument,
 };
 
@@ -34,7 +35,11 @@ export function gql(source: string): unknown;
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query Classes($classNumbers: [Int!]!, $term: String!) {\n    classes(classNumbers: $classNumbers, term: $term) {\n      classNumber,\n      schedules {\n        days,\n        startTime,\n        endTime\n      }\n    }\n  }\n"): (typeof documents)["\n  query Classes($classNumbers: [Int!]!, $term: String!) {\n    classes(classNumbers: $classNumbers, term: $term) {\n      classNumber,\n      schedules {\n        days,\n        startTime,\n        endTime\n      }\n    }\n  }\n"];
+export function gql(source: "\n  query GetClassSchedules($class_numbers: [Int!]!, $term: String!) {\n    classes(classNumbers: $class_numbers, term: $term) {\n      classNumber,\n      schedules {\n        days,\n        startTime,\n        endTime\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetClassSchedules($class_numbers: [Int!]!, $term: String!) {\n    classes(classNumbers: $class_numbers, term: $term) {\n      classNumber,\n      schedules {\n        days,\n        startTime,\n        endTime\n      }\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query GetScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {\n    classes(classNumbers: $class_numbers, term: $term) {\n      classNumber,\n      course {\n        code\n      },\n      classSection,\n      title,\n      schedules {\n        location,\n        instructors {\n          name\n        }\n        days,\n        startTime,\n        endTime\n      },\n      hours\n    }\n  }\n"): (typeof documents)["\n  query GetScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {\n    classes(classNumbers: $class_numbers, term: $term) {\n      classNumber,\n      course {\n        code\n      },\n      classSection,\n      title,\n      schedules {\n        location,\n        instructors {\n          name\n        }\n        days,\n        startTime,\n        endTime\n      },\n      hours\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

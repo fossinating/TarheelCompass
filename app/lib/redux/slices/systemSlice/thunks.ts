@@ -13,7 +13,7 @@ export const updateUserData = createAppAsyncThunk(
   async () => {
     const response = await fetchUserData()
 
-
+    
 
     // The value we return becomes the `fulfilled` action payload
     return response
@@ -30,7 +30,16 @@ export const updateTerms = createAppAsyncThunk(
         }
       })
 
-    let data: Array<TermData> = await res.json();
+    let data: {terms: Array<TermData>, defaultTerm: string | undefined} = {terms: await res.json(), defaultTerm: undefined};
+
+    data.terms.forEach(term => {
+      if (term.default === true) {
+        data.defaultTerm = term.id;
+        return data;
+      }
+    });
+
+    data.defaultTerm = data.terms[0].id
 
     // The value we return becomes the `fulfilled` action payload
     return data

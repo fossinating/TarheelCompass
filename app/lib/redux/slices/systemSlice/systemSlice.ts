@@ -1,4 +1,9 @@
 /* Core */
+import { AddClassParams } from '@/api/user/schedule/add_class/route';
+import { DeleteScheduleParams } from '@/api/user/schedule/delete_schedule/route';
+import { RemoveClassParams } from '@/api/user/schedule/remove_class/route';
+import { RenameScheduleParams } from '@/api/user/schedule/rename_schedule/route';
+import { ChangeUsernameParams } from '@/api/user/username/route';
 import { TermData } from '@/lib/Common';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 import {v4 as uuidv4} from 'uuid';
@@ -11,8 +16,8 @@ const getInitialState = (): SystemSliceState => {
     schedules: [],
     currentScheduleIndex: -1,
     status: 'idle',
-    terms: [],
-    termsStatus: 'loading'
+    terms: undefined,
+    defaultTerm: undefined
   } as SystemSliceState
 
   if (typeof window !== 'undefined') {
@@ -34,7 +39,7 @@ export const systemSlice = createSlice({
   initialState: getInitialState(),
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
-    addClass: (state, action: PayloadAction<{classNumber: number, scheduleID: string}>) => {
+    addClass: (state, action: PayloadAction<AddClassParams>) => {
       // Redux Toolkit allows us to write "mutating" logic in reducers. It
       // doesn't actually mutate the state because it uses the Immer library,
       // which detects changes to a "draft state" and produces a brand new
@@ -46,7 +51,7 @@ export const systemSlice = createSlice({
         }
       }
     },
-    removeClass: (state, action: PayloadAction<{classNumber: number, scheduleID: string}>) => {
+    removeClass: (state, action: PayloadAction<RemoveClassParams>) => {
       let schedule = state.schedules.find((schedule) => schedule.id === action.payload.scheduleID);
       if (schedule) {
         schedule.classNumbers = schedule.classNumbers.filter(class_number => class_number != action.payload.classNumber);
@@ -67,10 +72,10 @@ export const systemSlice = createSlice({
         return{ payload: {term: term, name: name, id: id}};
       }
     },
-    deleteSchedule: (state, action: PayloadAction<string>) => {
-      state.schedules = state.schedules.filter((schedule) => {schedule.id !== action.payload});
+    deleteSchedule: (state, action: PayloadAction<DeleteScheduleParams>) => {
+      state.schedules = state.schedules.filter((schedule) => {schedule.id !== action.payload.id});
     },
-    renameSchedule: (state, action: PayloadAction<{id: string, newName: string}>) => {
+    renameSchedule: (state, action: PayloadAction<RenameScheduleParams>) => {
       let schedule = state.schedules.find((schedule) => {schedule.id === action.payload.id});
       if (schedule) {
         schedule.name = action.payload.newName;
@@ -86,21 +91,32 @@ export const systemSlice = createSlice({
       })
       .addCase(updateUserData.fulfilled, (state, action) => {
         state.status = 'idle'
-        state.currentScheduleIndex = Math.max(action.payload.schedules.findIndex((schedule) => {schedule.id = state.schedules[state.currentScheduleIndex].id}), Math.min(0, action.payload.length-1))
-        state.schedules = action.payload.schedules;
+        if (action.payload.schedules == undefined) {
+          state.currentScheduleIndex = 0;
+          state.schedules = action.payload.schedules;
+        } else {
+          const changedIndex = state.currentScheduleIndex >= 0 ? action.payload.schedules.findIndex((schedule) => {schedule.id = state.schedules[state.currentScheduleIndex].id}) : -1;
+          if (changedIndex < 0) {
+            // previously selected schedule must have been deleted elsewhere
+            let targetTerm = state.defaultTerm;
+            if (targetTerm === undefined) {
+              if (state.currentScheduleIndex >= 0 && state.schedules.length > 0){
+                targetTerm = state.schedules[state.currentScheduleIndex].term
+              }
+            }
+            state.currentScheduleIndex = Math.max(action.payload.schedules.findIndex((schedule) => {schedule.term == targetTerm}), Math.min(0, action.payload.schedules.length-1))
+          } else {
+            state.currentScheduleIndex = changedIndex;
+          }
+          state.schedules = action.payload.schedules;
+        }
       })
       .addCase(updateUserData.rejected, (state) => {
         state.status = 'failed'
       })
-      .addCase(updateTerms.pending, (state) => {
-        state.termsStatus = 'loading'
-      })
       .addCase(updateTerms.fulfilled, (state, action) => {
-        state.termsStatus = 'idle';
-        state.terms = action.payload;
-      })
-      .addCase(updateTerms.rejected, (state) => {
-        state.termsStatus = 'failed'
+        state.terms = action.payload.terms;
+        state.defaultTerm = action.payload.defaultTerm
       })
   },
 })
@@ -119,8 +135,8 @@ export interface SystemSliceState {
   schedules: Array<Schedule>
   currentScheduleIndex: number
   status: 'loading' | 'failed' | 'idle'
-  terms: Array<TermData>
-  termsStatus: 'loading' | 'failed' | 'idle'
+  terms: Array<TermData> | undefined
+  defaultTerm: string | undefined
 }
 
 export interface SystemData {

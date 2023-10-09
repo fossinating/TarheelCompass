@@ -7,3 +7,5 @@ import type { ReduxState } from '@/lib/redux'
 export const selectSchedules = (state: ReduxState) => state.system.schedules
 export const selectCurrentScheduleIndex = (state: ReduxState) => state.system.currentScheduleIndex
 export const selectSystem = (state: ReduxState) => state.system
+export const selectTerms = (state: ReduxState) => state.system.terms
+export const selectDefaultTerm = (state: ReduxState) => state.system.defaultTerm

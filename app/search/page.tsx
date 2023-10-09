@@ -78,7 +78,7 @@ export default function Page() {
                 value = {term != null ? term : "Loading"}
                 disabled = {term == null}
               >
-                {terms.length > 0 ? 
+                {terms != undefined && terms.length > 0 ? 
                   terms.map((term) =>
                     <MenuItem key={term.id} value={term.id}>{term.name}</MenuItem>
                   )

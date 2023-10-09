@@ -2,7 +2,6 @@ import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
-import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Collapse from '@mui/material/Collapse';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
@@ -11,14 +10,13 @@ import AddIcon from '@mui/icons-material/Add';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import RemoveIcon from '@mui/icons-material/Remove';
 import WarningIcon from '@mui/icons-material/Warning';
-import { CircularProgress, Container, Divider, ListItemIcon, ListItemText, Menu, MenuItem, SelectChangeEvent, Tooltip } from '@mui/material';
+import { CardContent, CircularProgress, Container, Divider, ListItemIcon, ListItemText, Menu, MenuItem, SelectChangeEvent, Tooltip } from '@mui/material';
 import ReportIcon from '@mui/icons-material/Report';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { addClass, removeClass, Schedule, selectCurrentScheduleIndex, selectSchedules, systemSlice } from './redux';
 import Login from '@mui/icons-material/Login';
 import Logout from '@mui/icons-material/Logout';
 import Settings from '@mui/icons-material/Settings';
-import { signOut, signIn } from 'next-auth/react';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CheckCircle from '@mui/icons-material/CheckCircle';
 import Add from '@mui/icons-material/Add';
@@ -88,8 +86,8 @@ export interface ClassDisplayInfo {
 }
 
 const GET_CLASSES_SCHEDULE_DATA = gql(`
-  query Classes($classNumbers: [Int!]!, $term: String!) {
-    classes(classNumbers: $classNumbers, term: $term) {
+  query GetClassSchedules($class_numbers: [Int!]!, $term: String!) {
+    classes(classNumbers: $class_numbers, term: $term) {
       classNumber,
       schedules {
         days,
@@ -123,8 +121,10 @@ function ScheduleAdder(props: {classInfo: ClassDisplayInfo, schedule: Schedule, 
   };
 
   const { loading, error, data } = useQuery(GET_CLASSES_SCHEDULE_DATA, {
-    variables: {classNumbers: props.schedule.classNumbers, term: props.classInfo.term}
+    variables: {class_numbers: props.schedule.classNumbers, term: props.classInfo.term}
   });
+
+  console.log(props.schedule)
 
   React.useEffect(() => {
     let foundSomething = false;
@@ -171,6 +171,12 @@ function ScheduleAdder(props: {classInfo: ClassDisplayInfo, schedule: Schedule, 
     {props.schedule.name}
   </MenuItem>
   )
+}
+
+function titleCase(str: string) {
+  return str.toLowerCase().split(' ').map(function(word) {
+    return word.replace(word[0], word[0].toUpperCase());
+  }).join(' ');
 }
 
 
@@ -250,22 +256,19 @@ export default function ClassDisplay(props: { classInfo: ClassDisplayInfo }) {
           </Container>}
       />
       <CardContent>
-        {props.classInfo.schedules.map(schedule => {
-          return (
-            <>
-              <Typography variant="body1" color="text.secondary" key={schedule.days + schedule.startTime}>
-                {schedule.days} {
-                (Math.floor(schedule.startTime / 60) + 1) % 12 + 1}:{schedule.startTime%60} {schedule.startTime >= 13*60 ? "PM" : "AM"} - {
-                (Math.floor(schedule.endTime / 60) + 1) % 12 + 1}:{schedule.endTime%60} {schedule.endTime >= 13*60 ? "PM" : "AM"}
-              </Typography>
-              {schedule.instructors.map(instructor => {
-                <Typography variant="body1" key={instructor.name} color="text.secondary">{instructor.name}</Typography>
-              })}
-            </>
-          )
-        }
+        {props.classInfo.schedules.map((schedule) => 
+          <div key={schedule.days + schedule.startTime}>
+            <Typography variant="body1" color="text.secondary" key={schedule.days + schedule.startTime}>
+              {schedule.days} {
+              (Math.floor(schedule.startTime / 60) - 1) % 12 + 1}:{(schedule.startTime%60).toString().padStart(2, "0")} {schedule.startTime >= 13*60 ? "PM" : "AM"} - {
+              (Math.floor(schedule.endTime / 60) - 1) % 12 + 1}:{(schedule.endTime%60).toString().padStart(2, "0")} {schedule.endTime >= 13*60 ? "PM" : "AM"}
+            </Typography>
+            <Typography variant="body1" color="text.secondary">{schedule.instructors.map((instructor) => titleCase(instructor.name.split(",").reverse().join(" "))).join(", ")}</Typography>
+            
+          </div>
         )}
         <Typography variant="body2" color="text.secondary">{props.classInfo.hours} credit hours</Typography>
+        
       </CardContent>
       <CardActions disableSpacing>
         <IconButton aria-label="Add to schedule" onClick={handleAddClick}>

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "../auth/[...nextauth]/route"
 import { prisma } from '@/lib/Prisma';
+
+export const runtime = 'edge';
  
 export async function GET() {
     const session = await getServerSession(authOptions)
@@ -20,10 +22,13 @@ export async function GET() {
                 classes: true
             }
         })
-  
- 
+
+        let expanded = userSchedules.map((oldSchedule) => {return {...oldSchedule, classNumbers: oldSchedule.classes.map((classObj) => classObj.classNumber)}})
+
+        let retract = expanded.map(({classes, ...oldSchedule}) => oldSchedule)
+         
         return NextResponse.json({ 
-            schedules: userSchedules
+            schedules: retract
         }, {status: 200});
     } else {
         // Not Signed in

@@ -2,11 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "../../../auth/[...nextauth]/route"
 import { prisma } from '@/lib/Prisma';
+
+export const runtime = 'edge';
+
+export interface RenameScheduleParams {
+    id: string;
+    newName: string;
+};
  
 export async function POST(req: NextRequest) {
     const session = await getServerSession(authOptions)
     if (session && session?.user) {
-        let data: {id: string, name: string} = await req.json();
+
+        let data: RenameScheduleParams = await req.json();
         // use `prisma` in your application to read and write data in your DB
 
         if (session.user.id == null) {
@@ -21,7 +29,7 @@ export async function POST(req: NextRequest) {
                 ownerID: session.user.id
             },
             data: {
-                name: data.name
+                name: data.newName
             }
         })
 

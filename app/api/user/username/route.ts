@@ -2,18 +2,25 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "../../auth/[...nextauth]/route"
 import { PrismaClient } from '@prisma/client'
+
+export const runtime = 'edge';
+
+export interface ChangeUsernameParams {
+    newUsername: string;
+}
  
 export async function POST(req: NextRequest) {
     const session = await getServerSession(authOptions)
     if (session && session?.user && session.user?.email) {
-        let data = await req.json();
-        if (data?.username && data.username.length > 2 && data.username.length <= 20 && data.username.match("^[a-z0-9][a-z0-9\_.\-]+[a-z0-9]$") !== null) {
+
+        let data: ChangeUsernameParams = await req.json();
+        if (data?.newUsername && data.newUsername.length > 2 && data.newUsername.length <= 20 && data.newUsername.match("^[a-z0-9][a-z0-9\_.\-]+[a-z0-9]$") !== null) {
             const prisma = new PrismaClient()
             // use `prisma` in your application to read and write data in your DB
     
             const currentUser = await prisma.user.findFirst({
                 where: {
-                    name: data.username
+                    name: data.newUsername
                 }
             })
 
@@ -28,7 +35,7 @@ export async function POST(req: NextRequest) {
                     email: session.user.email
                 },
                 data: {
-                    name: data.username
+                    name: data.newUsername
                 }
             })
             

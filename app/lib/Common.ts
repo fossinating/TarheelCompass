@@ -1,4 +1,6 @@
 import { useState, useEffect, SetStateAction, Dispatch } from "react";
+import { useSelector } from "react-redux";
+import { selectDefaultTerm, selectTerms } from "./redux";
 
 export class SectionData {
     course_code: string;
@@ -66,37 +68,23 @@ export interface TermData {
   default?: boolean;
 }
 
-export function useTerms(): [TermData[], string|undefined, Dispatch<SetStateAction<string|undefined>>] {
-    const [terms, setTerms] = useState<TermData[]>([]);
-    const [term, setTerm] = useState<string | undefined>();
+export function useTerms(): [TermData[]|undefined, string|undefined, Dispatch<SetStateAction<string|undefined>>] {
 
-    useEffect( () => {
-      fetch("https://api.tarheelcompass.com/terms", {
-        method: "GET",
-        headers: {
-          'content-type': 'application/json;charset=UTF-8',
-        }
-      }).then(
-        res => res.json()
-      ).then(
-        (result: TermData[]) => {
-          setTerms(result);
-          result.forEach(element => {
-            if (element.default) {
-              setTerm(element.id);
-              return;
-            }
-          });
-          setTerm(result[0].id);
-        },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {
-          console.log(error);
-        }
-      )
-    }, []);
+    const terms = useSelector(selectTerms);
+    const defaultTerm = useSelector(selectDefaultTerm);
+    const [term, setTerm] = useState<string | undefined>(defaultTerm);
+
+    useEffect(() => {
+      if (term === undefined) {
+        setTerm(defaultTerm)
+      }
+    },[defaultTerm])
 
     return [terms, term, setTerm];
+}
+
+export function titleCase(str: string) {
+  return str.toLowerCase().split(' ').map(function(word) {
+    return word.replace(word[0], word[0].toUpperCase());
+  }).join(' ');
 }

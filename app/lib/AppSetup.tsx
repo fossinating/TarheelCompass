@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { updateUserData, useDispatch } from './redux';
+import { updateTerms, updateUserData, useDispatch } from './redux';
 
 export const AppSetup = (props: React.PropsWithChildren) => {
 
@@ -10,6 +10,7 @@ export const AppSetup = (props: React.PropsWithChildren) => {
     // Things in here will be called once, after the providers for everything have been set up
     React.useEffect(() => {
         dispatch(updateUserData())
+        dispatch(updateTerms())
     }, [])
     
     return (<>{props.children}</>);

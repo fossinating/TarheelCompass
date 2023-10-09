@@ -4,7 +4,6 @@
 
 # Interactions
 
-- Update schedules from server
 - Migration dialog
   - Give option to migrate after a successful first login on device
 

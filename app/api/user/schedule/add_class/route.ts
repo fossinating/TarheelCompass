@@ -2,16 +2,23 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "../../../auth/[...nextauth]/route"
 import { prisma } from '@/lib/Prisma';
- 
+
+export const runtime = 'edge';
+
+export interface AddClassParams {
+    scheduleID: string,
+    classNumber: number
+}
+
 export async function POST(req: NextRequest) {
     const session = await getServerSession(authOptions)
     if (session && session?.user) {
-        let data: {schedule_id: string, class_number: number} = await req.json();
+        let data: AddClassParams = await req.json();
         // use `prisma` in your application to read and write data in your DB
     
         const schedule = await prisma.schedule.findFirst({
             where: {
-                id: data.schedule_id,
+                id: data.scheduleID,
                 ownerID: session.user.id as string
             }
         })
@@ -24,8 +31,8 @@ export async function POST(req: NextRequest) {
 
         const addClass = await prisma.scheduledClass.create({
             data: {
-                scheduleID: data.schedule_id,
-                classNumber: data.class_number
+                scheduleID: data.scheduleID,
+                classNumber: data.classNumber
             }
         })
         
