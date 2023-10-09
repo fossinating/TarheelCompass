@@ -23,10 +23,10 @@
     "paths": {
       "@/*": ["app/*"],
       "crypto": [
-        "node_modules/.pnpm/crypto-browserify"
+        "node_modules/crypto-browserify"
       ],
       "stream": [
-        "node_modules/.pnpm/stream-browserify"
+        "node_modules/stream-browserify"
       ]
     }
   },
