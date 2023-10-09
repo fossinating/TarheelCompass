@@ -1,14 +1,13 @@
-import * as React from 'react';
+import { DialogContentText, FormControl, FormGroup } from '@mui/material';
 import Button from '@mui/material/Button';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Dialog from '@mui/material/Dialog';
-import { DialogContentText, FormControl, FormGroup, TextField } from '@mui/material';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import Link from 'next/link';
-import { useLocalStorage } from '../localstorage';
+import * as React from 'react';
 
 
 export default function WelcomeDialog() {
@@ -52,7 +51,7 @@ export default function WelcomeDialog() {
         <DialogTitle>Welcome to Tarheel Compass!</DialogTitle>
         <DialogContent>
             <DialogContentText>
-                We're happy to have you, but before you can continue, we have to ask a few legal questions.
+                We&apos;re happy to have you, but before you can continue, we have to ask a few legal questions.
             </DialogContentText>
             <DialogContentText fontWeight="bold">
                 <br/>

@@ -1,15 +1,14 @@
 'use client'
 
 /* Core */
-import { Provider, useDispatch } from 'react-redux'
+import { Provider } from 'react-redux'
 
 /* Instruments */
-import { SessionProvider } from 'next-auth/react'
-import { ScheduleProvider } from '../scheduleManager'
 import { ApolloClient, ApolloProvider, InMemoryCache, NormalizedCacheObject } from '@apollo/client'
 import { ThemeProvider, useTheme } from '@emotion/react'
 import { CachePersistor, LocalStorageWrapper } from 'apollo3-cache-persist'
-import { useState, useEffect } from 'react'
+import { SessionProvider } from 'next-auth/react'
+import { useEffect, useState } from 'react'
 import { reduxStore } from './redux'
 
 export const Providers = (props: React.PropsWithChildren) => {

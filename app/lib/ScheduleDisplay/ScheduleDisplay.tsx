@@ -1,11 +1,11 @@
 "use client"
-import "./ScheduleDisplay.css"
-import * as React from 'react';
-import { Schedule } from '../redux';
-import { gql } from "src/__generated__";
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import { Card, CardContent, Typography } from "@mui/material";
+import * as React from 'react';
+import { gql } from "src/__generated__";
 import { titleCase } from "../Common";
+import { Schedule } from '../redux';
+import "./ScheduleDisplay.css";
 
 function ClassSlot(props: {classData: {course: {code: string}, classSection: string, title: string, hours: number}, schedule: {location: string, instructors: Array<{name: string}>, startTime: number, endTime: number}, classIndex: number, classCount: number}) {
   console.log(props.classIndex, props.classCount)
@@ -101,7 +101,7 @@ export default function ScheduleDisplay(props: {schedule: Schedule, editable?: b
             <h2 className="day-indicator" style={{gridColumn: "6/7"}}>Friday</h2>
             {
                 [...Array(14).keys()].map((hour) => 
-                    <h2 className="hour-indicator" style={{gridRow: (hour * 12 + 2).toString() + "/" + (hour * 12 + 3).toString()}}>{ ((hour + 8 - 1) % 12 + 1).toString() + ((hour + 8) > 11 ? " PM" : " AM") }</h2>
+                    <h2 key={hour} className="hour-indicator" style={{gridRow: (hour * 12 + 2).toString() + "/" + (hour * 12 + 3).toString()}}>{ ((hour + 8 - 1) % 12 + 1).toString() + ((hour + 8) > 11 ? " PM" : " AM") }</h2>
                 )
             }
             <div className="hour-background"></div>

@@ -1,4 +1,4 @@
-import { useState, useEffect, SetStateAction, Dispatch } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectDefaultTerm, selectTerms } from "./redux";
 

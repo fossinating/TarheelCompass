@@ -1,15 +1,12 @@
 'use client';
-import { AppBar, Unstable_Grid2 as Grid, TextField, Button, Container, MenuItem, FormControl, InputLabel, Snackbar, IconButton } from "@mui/material";
+import { useLazyQuery } from "@apollo/client";
+import { Button, Container, FormControl, InputLabel, MenuItem, TextField, Unstable_Grid2 as Grid } from "@mui/material";
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import ClassDisplay from "../lib/ClassDisplay";
-import "./Search.css";
-import { SectionData, useTerms } from "../lib/Common";
-import { useState, useRef, useEffect } from "react";
-import React from "react";
-import CloseIcon from '@mui/icons-material/Close';
-import { ScheduleProvider } from "../scheduleManager";
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { useRef, useState } from "react";
 import { gql } from "../../src/__generated__";
+import ClassDisplay from "../lib/ClassDisplay";
+import { SectionData, useTerms } from "../lib/Common";
+import "./Search.css";
 
 export interface SnackbarMessage {
   message: string;

@@ -1,7 +1,4 @@
-import { useSession } from "next-auth/react";
-import { ReactElement, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { loadData, ReduxDispatch, updateUserData } from "./lib/redux";
+import { ReactElement } from "react";
 
 class ScheduleBlock {
     startTime: number;

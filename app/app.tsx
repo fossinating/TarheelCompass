@@ -1,26 +1,25 @@
 'use client'
 
-import * as React from 'react';
-import { styled } from '@mui/material/styles';
+import CalendarViewWeekIcon from '@mui/icons-material/CalendarViewWeek';
+import MenuIcon from '@mui/icons-material/Menu';
+import SearchIcon from '@mui/icons-material/Search';
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
+import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import CalendarViewWeekIcon from '@mui/icons-material/CalendarViewWeek';
-import SearchIcon from '@mui/icons-material/Search';
-import Link from "./lib/Link";
-import { usePathname } from 'next/navigation';
-import AccountMenu from './lib/AccountMenu';
-import { createTheme } from '@mui/material/styles';
-import { useEffect } from 'react';
+import { createTheme, styled } from '@mui/material/styles';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
 import { useSession } from 'next-auth/react';
+import { usePathname } from 'next/navigation';
+import * as React from 'react';
+import { useEffect } from 'react';
+import AccountMenu from './lib/AccountMenu';
+import Link from "./lib/Link";
 import { updateUserData, useDispatch } from './lib/redux';
 
 

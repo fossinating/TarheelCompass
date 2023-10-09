@@ -3,8 +3,6 @@ import { getServerSession } from "next-auth/next"
 import { authOptions } from "../../../auth/[...nextauth]/route"
 import { prisma } from '@/lib/Prisma';
 
-export const runtime = 'edge';
-
 export interface CreateScheduleParams {
     id: string;
     name: string;

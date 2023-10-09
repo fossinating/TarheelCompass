@@ -1,5 +1,5 @@
 "use client";
-import { List, ListItem, Typography, Container } from "@mui/material";
+import { Container, Typography } from "@mui/material";
 import Link from "../lib/Link";
 
 const terms_version = 1;
@@ -13,7 +13,7 @@ export default function Page() {
             <br />
             <Typography variant="h5">Introduction</Typography>
             <Typography>
-                Welcome to Tarheel Compass's Terms of Service! These terms govern your use of our services, including our website, software, and any associated products or features (collectively referred to as the "Service").
+                Welcome to Tarheel Compass&apos;s Terms of Service! These terms govern your use of our services, including our website, software, and any associated products or features (collectively referred to as the &quot;Service&quot;).
                 By accessing or using our Service, you agree to be bound by these terms. If you do not agree with any part of these terms, please refrain from using our Service.
             </Typography>
             <Typography variant="h5">User Obligations</Typography>
@@ -42,7 +42,7 @@ export default function Page() {
             </Typography>
             <Typography variant="h5">Disclaimer of Warranties</Typography>
             <Typography>
-                The Service is provided on an "as is" and "as available" basis, without any warranties or conditions, express or implied.
+                The Service is provided on an &quot;as is&quot; and &quot;as available&quot; basis, without any warranties or conditions, express or implied.
                 We do not warrant that the Service will be uninterrupted, error-free, or free from viruses or other harmful components.
             </Typography>
             <Typography variant="h5">Limitation of Liability</Typography>

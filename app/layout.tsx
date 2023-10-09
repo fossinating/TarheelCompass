@@ -1,8 +1,8 @@
-import './Layout.css';
 import * as React from 'react';
-import { Providers } from './lib/Providers';
 import App from './app';
-import {AppSetup} from './lib/AppSetup';
+import './Layout.css';
+import { AppSetup } from './lib/AppSetup';
+import { Providers } from './lib/Providers';
 
 export default function Layout({
   children,

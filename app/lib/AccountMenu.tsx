@@ -1,18 +1,18 @@
 'use client'
-import * as React from 'react';
+import Login from '@mui/icons-material/Login';
+import Logout from '@mui/icons-material/Logout';
+import Settings from '@mui/icons-material/Settings';
 import Avatar from '@mui/material/Avatar';
+import IconButton from '@mui/material/IconButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import Settings from '@mui/icons-material/Settings';
-import Logout from '@mui/icons-material/Logout';
 import { signIn, signOut, useSession } from "next-auth/react";
-import Login from '@mui/icons-material/Login';
-import WelcomeDialog from './WelcomeDialog';
+import * as React from 'react';
 import { useLocalStorage } from '../localstorage';
 import OnboardingDialog from './OnboardingDialog';
+import WelcomeDialog from './WelcomeDialog';
 
 // source: https://mui.com/material-ui/react-menu/#account-menu
 export default function AccountMenu() {

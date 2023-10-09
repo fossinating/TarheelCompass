@@ -21,7 +21,13 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["app/*"]
+      "@/*": ["app/*"],
+      "crypto": [
+        "node_modules/.pnpm/crypto-browserify"
+      ],
+      "stream": [
+        "node_modules/.pnpm/stream-browserify"
+      ]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

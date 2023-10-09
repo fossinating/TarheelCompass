@@ -3,8 +3,6 @@ import { getServerSession } from "next-auth/next"
 import { authOptions } from "../../auth/[...nextauth]/route"
 import { PrismaClient } from '@prisma/client'
 
-export const runtime = 'edge';
-
 export interface ChangeUsernameParams {
     newUsername: string;
 }

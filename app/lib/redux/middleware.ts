@@ -1,10 +1,9 @@
 /* Core */
-import { createListenerMiddleware, isAnyOf, ListenerEffectAPI } from '@reduxjs/toolkit';
-import { getSession, useSession } from 'next-auth/react';
-import { Action, Middleware } from 'redux';
-import { createLogger } from 'redux-logger'
-import { ReduxState, Schedule } from '.';
-import { changeCurrentSchedule, createSchedule, deleteSchedule, addClass, renameSchedule, removeClass } from './slices/systemSlice';
+import { createListenerMiddleware, isAnyOf } from '@reduxjs/toolkit';
+import { getSession } from 'next-auth/react';
+import { createLogger } from 'redux-logger';
+import { ReduxState } from '.';
+import { addClass, changeCurrentSchedule, createSchedule, deleteSchedule, removeClass, renameSchedule } from './slices/systemSlice';
 
 /*const SYNC_LOCALSTORAGE: Middleware = (store) => (next) => (action) => {
   const result = next(action);
@@ -160,4 +159,5 @@ const middleware = [
   })
 ]
 
-export { middleware, listenerMiddleware }
+export { middleware, listenerMiddleware };
+

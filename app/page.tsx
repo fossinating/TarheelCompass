@@ -1,4 +1,3 @@
-import React from 'react';
 import './index.css';
 //import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 //import reportWebVitals from './reportWebVitals';

@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "../auth/[...nextauth]/route"
 import { prisma } from '@/lib/Prisma';
-
-export const runtime = 'edge';
  
 export async function GET() {
     const session = await getServerSession(authOptions)
