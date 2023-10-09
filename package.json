@@ -59,6 +59,7 @@
     "trailingComma": "none"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.6.3",
     "@graphql-codegen/cli": "^5.0.0",
     "@graphql-codegen/client-preset": "^4.1.0",
     "@types/redux-logger": "^3.0.9",
