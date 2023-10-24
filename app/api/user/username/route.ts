@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "../../auth/[...nextauth]/route"
+import { auth } from '@/lib/auth';
 import { PrismaClient } from '@prisma/client'
 
 export const runtime = 'edge';
@@ -10,7 +9,7 @@ export interface ChangeUsernameParams {
 }
  
 export async function POST(req: NextRequest) {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     if (session && session?.user && session.user?.email) {
 
         let data: ChangeUsernameParams = await req.json();

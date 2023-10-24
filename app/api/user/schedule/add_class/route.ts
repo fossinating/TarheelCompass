@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "../../../auth/[...nextauth]/route"
 import { prisma } from '@/lib/Prisma';
+import { auth } from '@/lib/auth';
 
 export const runtime = 'edge';
 
@@ -11,7 +10,7 @@ export interface AddClassParams {
 }
 
 export async function POST(req: NextRequest) {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     if (session && session?.user) {
         let data: AddClassParams = await req.json();
         // use `prisma` in your application to read and write data in your DB

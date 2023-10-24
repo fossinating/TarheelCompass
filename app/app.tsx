@@ -113,16 +113,6 @@ export default function App({
       setOpen(!open);
     };
 
-    const { data: session, status } = useSession();
-    const dispatch = useDispatch();
-
-
-    useEffect(() => {
-        // Update schedules from stored version if user is logged in
-        if (status === "authenticated") {
-            dispatch(updateUserData());
-        }
-      }, [])
 
     return (
         <>
