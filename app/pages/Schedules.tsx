@@ -1,6 +1,7 @@
 "use client"
 import { selectCurrentScheduleIndex, selectSchedules } from '@/lib/redux';
 import ScheduleDisplay from '@/lib/ScheduleDisplay/ScheduleDisplay';
+import { CircularProgress } from '@mui/material';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import { styled } from '@mui/material/styles';
@@ -42,12 +43,20 @@ export default function PersistentDrawerRight() {
   const currentScheduleIndex = useSelector(selectCurrentScheduleIndex);
   const [selectedClass, setSelectedClass] = React.useState<number|null>(null);
 
-  return (
-    <Box id="schedulePageLayoutContainer" style={{height:"100%"}}>
-      <ScheduleDisplay schedule={schedules[currentScheduleIndex]} selectedClass={selectedClass} setSelected={setSelectedClass}/>
-      <Drawer>
-        
-      </Drawer>
-    </Box>
-  );
+  if (schedules != undefined) {
+    return (
+      <Box id="schedulePageLayoutContainer" style={{height:"100%"}}>
+        <ScheduleDisplay schedule={schedules[currentScheduleIndex]} selectedClass={selectedClass} setSelected={setSelectedClass}/>
+        <Drawer>
+          
+        </Drawer>
+      </Box>
+    );
+  } else {
+    return (
+      <Box id="schedulePageLayoutContainer" style={{height:"100%"}}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 }

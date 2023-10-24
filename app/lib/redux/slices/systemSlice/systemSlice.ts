@@ -25,6 +25,9 @@ const getInitialState = (): SystemSliceState => {
     if (scheduleString) {
       state.schedules = JSON.parse(scheduleString);
     }
+    if (!Array.isArray(state.schedules)) {
+      state.schedules = []
+    }
 
     let currentScheduleIndexString = localStorage.getItem("currentScheduleIndex");
     if (currentScheduleIndexString) {
@@ -93,7 +96,7 @@ export const systemSlice = createSlice({
         state.status = 'idle'
         if (action.payload.schedules == undefined) {
           state.currentScheduleIndex = 0;
-          state.schedules = action.payload.schedules;
+          state.schedules = [];// so i was wondering why my schedules were being set to undefined
         } else {
           const changedIndex = state.currentScheduleIndex >= 0 ? action.payload.schedules.findIndex((schedule) => {schedule.id = state.schedules[state.currentScheduleIndex].id}) : -1;
           if (changedIndex < 0) {
@@ -108,7 +111,10 @@ export const systemSlice = createSlice({
           } else {
             state.currentScheduleIndex = changedIndex;
           }
-          state.schedules = action.payload.schedules;
+          if (Array.isArray(action.payload.schedules)) {
+            state.schedules = action.payload.schedules;
+            console.log("schedules changed to: ", state.schedules)
+          }
         }
       })
       .addCase(updateUserData.rejected, (state) => {

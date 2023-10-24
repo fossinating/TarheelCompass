@@ -37,6 +37,7 @@ const nextConfig = {
     domains: ['avatars.githubusercontent.com', 'avatar.vercel.sh']
   },
   experimental: {
+    serverActions: true,
     serverComponentsExternalPackages: ['@tremor/react']
   },
   reactStrictMode: true,

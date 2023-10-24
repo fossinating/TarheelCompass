@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "../auth/[...nextauth]/route"
-import { prisma } from '@/lib/Prisma';
+import { prismaEdge } from '@/lib/Prisma';
+import { auth } from "../../lib/auth"
 
 export const runtime = 'edge';
- 
+
 export async function GET() {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     if (session) {
         if (session.user.id == null) {
             return NextResponse.json({
@@ -14,7 +13,7 @@ export async function GET() {
             }, {status: 500})
         }
         
-        const userSchedules = await prisma.schedule.findMany({
+        const userSchedules = await prismaEdge.schedule.findMany({
             where: {
                 ownerID: session.user.id as string
             },
