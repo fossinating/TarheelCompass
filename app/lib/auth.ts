@@ -100,6 +100,10 @@ export const { handlers: {GET, POST}, auth } = NextAuth({
         })
         const failed = result.rejected.concat(result.pending).filter(Boolean)
         if (failed.length) {
+          console.log("rejected reason:");
+          console.log(result.rejected)
+          console.log("pending reason:");
+          console.log(result.pending)
           throw new Error(`Email (${failed.join(", ")}) could not be sent`)
         }
       },
