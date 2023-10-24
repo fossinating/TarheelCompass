@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { gql } from 'src/__generated__';
 import CreateScheduleDialog from './CreateScheduleDialog';
+import { titleCase } from './Common';
 import { addClass, removeClass, Schedule, selectCurrentScheduleIndex, selectSchedules } from './redux';
 
 interface ExpandMoreProps extends IconButtonProps {
@@ -164,12 +165,6 @@ function ScheduleAdder(props: {classInfo: ClassDisplayInfo, schedule: Schedule, 
     {props.schedule.name}
   </MenuItem>
   )
-}
-
-function titleCase(str: string) {
-  return str.toLowerCase().split(' ').map(function(word) {
-    return word.replace(word[0], word[0].toUpperCase());
-  }).join(' ');
 }
 
 
