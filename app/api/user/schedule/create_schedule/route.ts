@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { auth } from '@/backend_lib/auth';
 import { prisma } from '@/lib/Prisma';
+import { db } from '@/backend_lib/db/drizzle';
+import { eq } from 'drizzle-orm';
+import { schedules } from '@/backend_lib/db/schema';
 
 export const runtime = 'edge';
 
@@ -29,10 +32,8 @@ export async function POST(req: NextRequest) {
             }, {status: 500})
         }
 
-        const checkSchedule = await prisma.schedule.findFirst({
-            where: {
-                id: data.id
-            }
+        const checkSchedule = await db.query.schedules.findFirst({
+            where: (schedules, {eq}) => eq(schedules.id, data.id)
         })
 
         if (checkSchedule != null) {
@@ -41,13 +42,11 @@ export async function POST(req: NextRequest) {
             }, {status: 400})
         }
 
-        const createSchedule = await prisma.schedule.create({
-            data: {
-                id: data.id,
-                name: data.name,
-                term: data.term,
-                ownerID: session.user.id as string
-            }
+        const createSchedule = await db.insert(schedules).values({
+            id: data.id,
+            name: data.name,
+            term: data.term,
+            ownerID: session.user.id as string
         })
         
         if (createSchedule === null) {

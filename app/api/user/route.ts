@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { prismaEdge } from '@/lib/Prisma';
-import { auth } from '@/lib/auth';
+import { auth } from '@/backend_lib/auth';
+import { db } from '@/backend_lib/db/drizzle';
+import { eq } from 'drizzle-orm';
+import { schedules } from '@/backend_lib/db/schema';
 
 export const runtime = 'edge';
 
@@ -13,11 +16,9 @@ export async function GET() {
             }, {status: 500})
         }
         
-        const userSchedules = await prismaEdge.schedule.findMany({
-            where: {
-                ownerID: session.user.id as string
-            },
-            include: {
+        const userSchedules = await db.query.schedules.findMany({
+            where: eq(schedules.ownerID, session.user.id),
+            with: {
                 classes: true
             }
         })

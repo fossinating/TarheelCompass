@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { auth } from '@/backend_lib/auth';
 import { PrismaClient } from '@prisma/client'
+import { db } from '@/backend_lib/db/drizzle';
+import { users } from '@/backend_lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 export const runtime = 'edge';
 
@@ -17,10 +20,8 @@ export async function POST(req: NextRequest) {
             const prisma = new PrismaClient()
             // use `prisma` in your application to read and write data in your DB
     
-            const currentUser = await prisma.user.findFirst({
-                where: {
-                    name: data.newUsername
-                }
+            const currentUser = await db.query.users.findFirst({
+                where: (users, {eq}) => eq(users.name, data.newUsername)
             })
 
             if (currentUser !== null) {
@@ -29,14 +30,7 @@ export async function POST(req: NextRequest) {
                 }, {status: 400})
             }
     
-            const updateUser = await prisma.user.update({
-                where: {
-                    email: session.user.email
-                },
-                data: {
-                    name: data.newUsername
-                }
-            })
+            const updateUser = await db.update(users).set({name: data.newUsername}).where(eq(users.email, session.user.email))
             
             if (updateUser === null) {
                 return NextResponse.json({

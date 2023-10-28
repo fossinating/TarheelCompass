@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/Prisma';
+import { auth } from '@/backend_lib/auth';
+import { db } from '@/backend_lib/db/drizzle';
+import { schedules } from '@/backend_lib/db/schema';
+import { and, eq } from 'drizzle-orm';
 
 export const runtime = 'edge';
 
@@ -22,15 +24,11 @@ export async function POST(req: NextRequest) {
             }, {status: 500})
         }
 
-        const updateSchedule = await prisma.schedule.update({
-            where: {
-                id: data.id,
-                ownerID: session.user.id
-            },
-            data: {
-                name: data.newName
-            }
-        })
+        const updateSchedule = await db.update(schedules).set({name: data.newName}).where(and(eq(schedules.id, data.id), eq(schedules.ownerID, session.user.id)))
+
+        
+        console.log("updateSchedule:")
+        console.log(updateSchedule)
 
         if (updateSchedule != null) {
             return NextResponse.json({

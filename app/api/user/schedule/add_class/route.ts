@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/Prisma';
-import { auth } from '@/lib/auth';
+import { auth } from '@/backend_lib/auth';
+import { db } from '@/backend_lib/db/drizzle';
+import { eq, and } from 'drizzle-orm';
+import { scheduledClasses } from '@/backend_lib/db/schema';
 
 export const runtime = 'edge';
 
@@ -15,11 +17,8 @@ export async function POST(req: NextRequest) {
         let data: AddClassParams = await req.json();
         // use `prisma` in your application to read and write data in your DB
     
-        const schedule = await prisma.schedule.findFirst({
-            where: {
-                id: data.scheduleID,
-                ownerID: session.user.id as string
-            }
+        const schedule = await db.query.schedules.findFirst({
+            where: (schedules, {eq}) => and(eq(schedules.id, data.scheduleID), eq(schedules.ownerID, session.user.id as string))
         })
 
         if (schedule == null) {
@@ -28,11 +27,9 @@ export async function POST(req: NextRequest) {
             }, {status: 400})
         }
 
-        const addClass = await prisma.scheduledClass.create({
-            data: {
-                scheduleID: data.scheduleID,
-                classNumber: data.classNumber
-            }
+        const addClass = await db.insert(scheduledClasses).values({
+            scheduleID: data.scheduleID,
+            classNumber: data.classNumber
         })
         
         if (addClass === null) {

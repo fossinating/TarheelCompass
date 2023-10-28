@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { auth } from '@/backend_lib/auth';
 import { prisma } from '@/lib/Prisma';
+import { db } from '@/backend_lib/db/drizzle';
+import { eq, and } from 'drizzle-orm';
+import { schedules } from '@/backend_lib/db/schema';
 
 export const runtime = 'edge';
 
@@ -21,12 +24,7 @@ export async function POST(req: NextRequest) {
             }, {status: 500})
         }
 
-        const deleteSchedule = await prisma.schedule.delete({
-            where: {
-                id: data.id,
-                ownerID: session.user.id
-            }
-        })
+        const deleteSchedule = await db.delete(schedules).where(and(eq(schedules.id, data.id), eq(schedules.ownerID, session.user.id)))
 
         if (deleteSchedule != null) {
             return NextResponse.json({

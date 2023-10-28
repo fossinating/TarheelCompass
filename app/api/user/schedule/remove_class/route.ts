@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { auth } from '@/backend_lib/auth';
 import { prisma } from '@/lib/Prisma';
+import { scheduledClasses, schedules } from '@/backend_lib/db/schema';
+import { db } from '@/backend_lib/db/drizzle';
+import { and, eq } from 'drizzle-orm';
 
 export const runtime = 'edge';
 
@@ -15,11 +18,8 @@ export async function POST(req: NextRequest) {
         let data: RemoveClassParams = await req.json();
         // use `prisma` in your application to read and write data in your DB
     
-        const schedule = await prisma.schedule.findFirst({
-            where: {
-                id: data.scheduleID,
-                ownerID: session.user.id as string
-            }
+        const schedule = await db.query.schedules.findFirst({
+            where: (schedules, {eq, and}) => and(eq(schedules.id, data.scheduleID), eq(schedules.ownerID, session.user.id))
         })
 
         if (schedule == null) {
@@ -28,21 +28,11 @@ export async function POST(req: NextRequest) {
             }, {status: 400})
         }
 
-        const removeClass = await prisma.schedule.update({
-            where: {
-                id: data.scheduleID,
-                ownerID: session.user.id as string
-            },
-            data: {
-                classes: {
-                    deleteMany: {
-                        classNumber: data.classNumber,
-                        scheduleID: data.scheduleID
-                    }
-                }
-            }
-        })
+        const removeClass = await db.delete(scheduledClasses).where(and(eq(scheduledClasses.classNumber, data.classNumber), eq(scheduledClasses.scheduleID, data.scheduleID)))
         
+        console.log("Remove Class:")
+        console.log(removeClass)
+
         if (removeClass === null) {
             return NextResponse.json({
                 errMessage: "Could not remove class from schedule. Please try again later."

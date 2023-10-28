@@ -3,6 +3,10 @@ import { Theme } from '@auth/core/types';
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth from 'next-auth';
 import { createTransport } from "nodemailer";
+import { DrizzleAdapter } from "@auth/drizzle-adapter"
+import { db } from "@/backend_lib/db/drizzle"
+
+console.log(typeof window)
 
 export const runtime = 'edge';
 
@@ -72,7 +76,7 @@ function text({ url, host }: { url: string; host: string }) {
 }
 
 export const { handlers: {GET, POST}, auth } = NextAuth({
-  adapter: PrismaAdapter(prisma),
+  adapter: DrizzleAdapter(db),
   providers: [
     {
       id: "email",
