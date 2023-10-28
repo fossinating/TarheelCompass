@@ -12,9 +12,13 @@ export const AppSetup = (props: React.PropsWithChildren) => {
 
     // Things in here will be called once, after the providers for everything have been set up
     React.useEffect(() => {
+        console.log("Status: ", status);
         if (status === "authenticated") {
             dispatch(updateUserData());
         }
+    }, [status])
+    
+    React.useEffect(() => {
         dispatch(updateTerms())
     }, [])
     

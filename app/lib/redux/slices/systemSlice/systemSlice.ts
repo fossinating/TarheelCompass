@@ -32,6 +32,8 @@ const getInitialState = (): SystemSliceState => {
     let currentScheduleIndexString = localStorage.getItem("currentScheduleIndex");
     if (currentScheduleIndexString) {
       state.currentScheduleIndex = JSON.parse(currentScheduleIndexString);
+    } else {
+      state.currentScheduleIndex = 0;
     }
   }
   return state
@@ -107,7 +109,7 @@ export const systemSlice = createSlice({
                 targetTerm = state.schedules[state.currentScheduleIndex].term
               }
             }
-            state.currentScheduleIndex = Math.max(action.payload.schedules.findIndex((schedule) => {schedule.term == targetTerm}), Math.min(0, action.payload.schedules.length-1))
+            state.currentScheduleIndex = Math.max(action.payload.schedules.findIndex((schedule) => {schedule.term == targetTerm}), Math.max(0, action.payload.schedules.length-1))
           } else {
             state.currentScheduleIndex = changedIndex;
           }

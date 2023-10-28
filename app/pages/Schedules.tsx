@@ -43,6 +43,11 @@ export default function PersistentDrawerRight() {
   const currentScheduleIndex = useSelector(selectCurrentScheduleIndex);
   const [selectedClass, setSelectedClass] = React.useState<number|null>(null);
 
+  //console.log(schedules);
+  //console.log(currentScheduleIndex);
+  
+  //console.log(schedules[currentScheduleIndex]);
+
   if (schedules != undefined) {
     return (
       <Box id="schedulePageLayoutContainer" style={{height:"100%"}}>

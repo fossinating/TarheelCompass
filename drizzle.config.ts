@@ -8,8 +8,8 @@ if (!process.env.DATABASE_URL) {
 }
 
 export default {
-  schema: './app/lib/db/schema.ts',
-  out: './app/lib/db/migrations',
+  schema: './app/backend_lib/db/schema.ts',
+  out: './app/backend_lib/db/migrations',
   driver: 'mysql2',
   dbCredentials: {
     connectionString: process.env.DATABASE_URL,

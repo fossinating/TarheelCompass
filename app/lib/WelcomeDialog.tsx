@@ -35,7 +35,7 @@ export default function WelcomeDialog() {
       };
 
     const onAccept = () => {
-        console.log(state)
+        //console.log(state)
         if (terms) {
             localStorage.setItem("ads", JSON.stringify(ads));
             localStorage.setItem("analytics", JSON.stringify(analytics));

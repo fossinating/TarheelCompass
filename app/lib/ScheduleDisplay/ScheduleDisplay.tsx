@@ -8,7 +8,7 @@ import { Schedule } from '../redux';
 import "./ScheduleDisplay.css";
 
 function ClassSlot(props: {classData: {course: {code: string}, classSection: string, title: string, hours: number}, schedule: {location: string, instructors: Array<{name: string}>, startTime: number, endTime: number}, classIndex: number, classCount: number}) {
-  console.log(props.classIndex, props.classCount)
+  //console.log(props.classIndex, props.classCount)
   return (
     <Card style={{gridRow: ((props.schedule.startTime - 480) / 5).toString() + "/" + ((props.schedule.endTime - 480) / 5).toString(), backgroundColor: "hsl(" + Math.round(360*(props.classIndex/(props.classCount))) + " 80% 80%)"}}>
       <CardContent>
@@ -81,8 +81,8 @@ export default function ScheduleDisplay(props: {schedule: Schedule, editable?: b
             dayCode = classSchedule.days.substring(i, i+2);
             i++;
           }
-          console.log(classSchedule, dayCode, i)
-          console.log("jj", classCount, data.classes.length)
+          //console.log(classSchedule, dayCode, i)
+          //console.log("jj", classCount, data.classes.length)
           newDayClasses[dayIndices.indexOf(dayCode)].push(<ClassSlot classData={classData} schedule={classSchedule} classIndex={classCount} classCount={data.classes.length}></ClassSlot>)
         }
       })

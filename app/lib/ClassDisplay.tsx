@@ -118,8 +118,6 @@ function ScheduleAdder(props: {classInfo: ClassDisplayInfo, schedule: Schedule, 
     variables: {class_numbers: props.schedule.classNumbers, term: props.classInfo.term}
   });
 
-  console.log(props.schedule)
-
   React.useEffect(() => {
     let foundSomething = false;
     if (data) {
