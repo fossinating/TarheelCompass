@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/backend_lib/auth';
-import { prisma } from '@/lib/Prisma';
 import { db } from '@/backend_lib/db/drizzle';
 import { eq, and } from 'drizzle-orm';
 import { schedules } from '@/backend_lib/db/schema';
@@ -16,7 +15,6 @@ export async function POST(req: NextRequest) {
     if (session && session?.user) {
 
         let data: DeleteScheduleParams = await req.json();
-        // use `prisma` in your application to read and write data in your DB
 
         if (session.user.id == null) {
             return NextResponse.json({

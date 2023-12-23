@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { prismaEdge } from '@/lib/Prisma';
 import { auth } from '@/backend_lib/auth';
 import { db } from '@/backend_lib/db/drizzle';
 import { eq } from 'drizzle-orm';

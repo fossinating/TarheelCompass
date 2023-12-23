@@ -16,7 +16,6 @@ export async function POST(req: NextRequest) {
     if (session && session?.user) {
 
         let data: RenameScheduleParams = await req.json();
-        // use `prisma` in your application to read and write data in your DB
 
         if (session.user.id == null) {
             return NextResponse.json({

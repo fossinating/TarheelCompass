@@ -15,7 +15,6 @@ export async function POST(req: NextRequest) {
     const session = await auth()
     if (session && session?.user) {
         let data: AddClassParams = await req.json();
-        // use `prisma` in your application to read and write data in your DB
     
         const schedule = await db.query.schedules.findFirst({
             where: (schedules, {eq}) => and(eq(schedules.id, data.scheduleID), eq(schedules.ownerID, session.user.id as string))

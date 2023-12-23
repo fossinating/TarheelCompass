@@ -1,8 +1,5 @@
-import { prisma } from '@/lib/Prisma';
 import { Theme } from '@auth/core/types';
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth from 'next-auth';
-import { createTransport } from "nodemailer";
 import { DrizzleAdapter } from "@auth/drizzle-adapter"
 import { db } from "@/backend_lib/db/drizzle"
 import Google from "@auth/core/providers/google"

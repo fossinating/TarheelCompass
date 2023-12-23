@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/backend_lib/auth';
-import { PrismaClient } from '@prisma/client'
 import { db } from '@/backend_lib/db/drizzle';
 import { users } from '@/backend_lib/db/schema';
 import { eq } from 'drizzle-orm';
@@ -17,8 +16,6 @@ export async function POST(req: NextRequest) {
 
         let data: ChangeUsernameParams = await req.json();
         if (data?.newUsername && data.newUsername.length > 2 && data.newUsername.length <= 20 && data.newUsername.match("^[a-z0-9][a-z0-9\_.\-]+[a-z0-9]$") !== null) {
-            const prisma = new PrismaClient()
-            // use `prisma` in your application to read and write data in your DB
     
             const currentUser = await db.query.users.findFirst({
                 where: (users, {eq}) => eq(users.name, data.newUsername)
