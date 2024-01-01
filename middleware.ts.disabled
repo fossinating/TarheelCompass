@@ -1,0 +1,18 @@
+//import { auth } from '@/lib/auth';
+/*
+export default auth(req => {
+    //console.log("auth", req.nextauth)
+  },
+  {
+    callbacks: {
+      authorized: () => true,
+    },
+  }
+)
+ 
+// See "Matching Paths" below to learn more
+export const config = {
+    matcher: [
+        '/((?!onboarding|api|_next/static|_next/image|favicon.ico).*)',
+    ],
+};*/
