@@ -130,7 +130,7 @@ export default function App({
                 <MenuIcon />
                 </IconButton>
                 <Typography variant="h6" noWrap component="div">
-                Course Manager
+                Tarheel Compass
                 </Typography>
                 <AccountMenu />
               </Toolbar>
