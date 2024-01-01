@@ -3,7 +3,7 @@ import { useLazyQuery } from "@apollo/client";
 import { Card, CardContent, Typography } from "@mui/material";
 import * as React from 'react';
 import { gql } from "src/__generated__";
-import { titleCase } from "../Common";
+import { readableTime, titleCase } from "../Common";
 import { Schedule } from '../redux';
 import "./ScheduleDisplay.css";
 
@@ -12,17 +12,20 @@ function ClassSlot(props: {classData: {course: {code: string}, classSection: str
   return (
     <Card style={{gridRow: ((props.schedule.startTime - 480) / 5).toString() + "/" + ((props.schedule.endTime - 480) / 5).toString(), backgroundColor: "hsl(" + Math.round(360*(props.classIndex/(props.classCount))) + " 80% 80%)"}}>
       <CardContent>
-        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+        {/*<Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
           {props.classData.title}
-        </Typography>
+        </Typography>*/}
         <Typography variant="h5" component="div">
           {props.classData.course.code} - {props.classData.classSection}
         </Typography>
         <Typography sx={{ mb: 1.5 }} color="text.secondary">
           {props.schedule.location}
         </Typography>
-        <Typography variant="body2">
+        {/*<Typography variant="body2">
           {props.schedule.instructors.map((instructor) => titleCase(instructor.name.split(",").reverse().join(" "))).join(", ")}
+        </Typography>*/}
+        <Typography sx={{ mb: 1.5 }} color="text.secondary">
+        {readableTime(props.schedule.startTime)} - {readableTime(props.schedule.endTime)}
         </Typography>
       </CardContent>
     </Card>

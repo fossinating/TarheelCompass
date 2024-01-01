@@ -41,7 +41,7 @@ export const Providers = (props: React.PropsWithChildren) => {
   const theme = useTheme();
 
   if (!client) {
-    return <h2>Initializing app...</h2>;
+    return <></>;
   }
   return (
     <Provider store={reduxStore}>

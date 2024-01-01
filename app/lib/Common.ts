@@ -88,3 +88,7 @@ export function titleCase(str: string) {
     return word.replace(word[0], word[0].toUpperCase());
   }).join(' ');
 }
+
+export function readableTime(time: number) {
+  return ((Math.floor(time / 60) - 1) % 12 + 1).toString() + ":" + (time%60).toString().padStart(2, "0") + (time >= 13*60 ? "PM" : "AM")
+}
