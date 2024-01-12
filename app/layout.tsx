@@ -15,7 +15,7 @@ export default function Layout({
   return (
     <html lang="en">
       <head>
-        <title>Tarheel Commpass</title>
+        <title>Tarheel Compass</title>
       </head>
       <body>
         <Providers>
