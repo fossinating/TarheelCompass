@@ -7,7 +7,7 @@ import { readableTime, titleCase } from "../Common";
 import { Schedule } from '../redux';
 import "./ScheduleDisplay.css";
 
-function ClassSlot(props: {classData: {course: {code: string}, classSection: string, title: string, hours: number}, schedule: {location: string, instructors: Array<{name: string}>, startTime: number, endTime: number}, classIndex: number, classCount: number}) {
+function ClassCard(props: {classData: {course: {code: string}, classSection: string, title: string, hours: number}, schedule: {location: string, instructors: Array<{name: string}>, startTime: number, endTime: number}, classIndex: number, classCount: number}) {
   //console.log(props.classIndex, props.classCount)
   return (
     <Card style={{gridRow: ((props.schedule.startTime - 480) / 5).toString() + "/" + ((props.schedule.endTime - 480) / 5).toString(), backgroundColor: "hsl(" + Math.round(360*(props.classIndex/(props.classCount))) + " 80% 80%)"}}>
@@ -86,7 +86,7 @@ export default function ScheduleDisplay(props: {schedule: Schedule, editable?: b
           }
           //console.log(classSchedule, dayCode, i)
           //console.log("jj", classCount, data.classes.length)
-          newDayClasses[dayIndices.indexOf(dayCode)].push(<ClassSlot classData={classData} schedule={classSchedule} classIndex={classCount} classCount={data.classes.length}></ClassSlot>)
+          newDayClasses[dayIndices.indexOf(dayCode)].push(<ClassCard classData={classData} schedule={classSchedule} classIndex={classCount} classCount={data.classes.length}></ClassCard>)
         }
       })
       classCount++;
@@ -95,26 +95,28 @@ export default function ScheduleDisplay(props: {schedule: Schedule, editable?: b
   }, [data])
 
   return (
-    <div id="schedule-container">
-        <div id="schedule">
-            <h2 className="day-indicator" style={{gridColumn: "2/3"}}>Monday</h2>
-            <h2 className="day-indicator" style={{gridColumn: "3/4"}}>Tuesday</h2>
-            <h2 className="day-indicator" style={{gridColumn: "4/5"}}>Wednesday</h2>
-            <h2 className="day-indicator" style={{gridColumn: "5/6"}}>Thursday</h2>
-            <h2 className="day-indicator" style={{gridColumn: "6/7"}}>Friday</h2>
-            {
-                [...Array(14).keys()].map((hour) => 
-                    <h2 key={hour} className="hour-indicator" style={{gridRow: (hour * 12 + 2).toString() + "/" + (hour * 12 + 3).toString()}}>{ ((hour + 8 - 1) % 12 + 1).toString() + ((hour + 8) > 11 ? " PM" : " AM") }</h2>
-                )
-            }
-            <div className="hour-background"></div>
-            
-            <div id="monday" className="day-schedule">{dayClasses[0]}</div>
-            <div id="tuesday" className="day-schedule">{dayClasses[1]}</div>
-            <div id="wednesday" className="day-schedule">{dayClasses[2]}</div>
-            <div id="thursday" className="day-schedule">{dayClasses[3]}</div>
-            <div id="friday" className="day-schedule">{dayClasses[4]}</div>
-        </div>
+    <div>
+      <div id="schedule-container">
+          <div id="schedule">
+              <h2 className="day-indicator" style={{gridColumn: "2/3"}}>Monday</h2>
+              <h2 className="day-indicator" style={{gridColumn: "3/4"}}>Tuesday</h2>
+              <h2 className="day-indicator" style={{gridColumn: "4/5"}}>Wednesday</h2>
+              <h2 className="day-indicator" style={{gridColumn: "5/6"}}>Thursday</h2>
+              <h2 className="day-indicator" style={{gridColumn: "6/7"}}>Friday</h2>
+              {
+                  [...Array(14).keys()].map((hour) => 
+                      <h2 key={hour} className="hour-indicator" style={{gridRow: (hour * 12 + 2).toString() + "/" + (hour * 12 + 3).toString()}}>{ ((hour + 8 - 1) % 12 + 1).toString() + ((hour + 8) > 11 ? " PM" : " AM") }</h2>
+                  )
+              }
+              <div className="hour-background"></div>
+              
+              <div id="monday" className="day-schedule">{dayClasses[0]}</div>
+              <div id="tuesday" className="day-schedule">{dayClasses[1]}</div>
+              <div id="wednesday" className="day-schedule">{dayClasses[2]}</div>
+              <div id="thursday" className="day-schedule">{dayClasses[3]}</div>
+              <div id="friday" className="day-schedule">{dayClasses[4]}</div>
+          </div>
+      </div>
     </div>
   );
 }
