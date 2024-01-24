@@ -51,10 +51,7 @@ export default function PersistentDrawerRight() {
   if (schedules != undefined) {
     return (
       <Box id="schedulePageLayoutContainer" style={{height:"100%"}}>
-        <ScheduleDisplay schedule={schedules[currentScheduleIndex]} selectedClass={selectedClass} setSelected={setSelectedClass}/>
-        <Drawer>
-          
-        </Drawer>
+        <ScheduleDisplay scheduleData={schedules[currentScheduleIndex]} showSidebar={true} />
       </Box>
     );
   } else {

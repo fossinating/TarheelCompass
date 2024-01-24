@@ -27,7 +27,7 @@
 
     display: grid;
     /* 14 hours, times 12 slots per hour */
-    grid-template: auto repeat(168, 1fr) / auto repeat(5, 1fr);
+    grid-template: auto repeat(168, 1fr) / auto repeat(7, 1fr);
 }
 
 #schedule-subcontainer {
@@ -40,7 +40,7 @@
 
     display: grid;
     /* 14 hours, times 12 slots per hour */
-    grid-template-columns: auto repeat(5, 1fr);
+    grid-template-columns: auto repeat(7, 1fr);
 }
 
 .hour-indicator, .day-indicator {
