@@ -151,8 +151,8 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
     return (<CircularProgress />)
   } else {
     return (
-      <div id="schedule-container">
-        <div id="schedule">
+      <div className="schedule-container">
+        <div className="schedule-box">
           <h2 className="day-indicator" style={{gridColumn: "2/3"}}>Sunday</h2>
           <h2 className="day-indicator" style={{gridColumn: "3/4"}}>Monday</h2>
           <h2 className="day-indicator" style={{gridColumn: "4/5"}}>Tuesday</h2>
@@ -178,7 +178,8 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
       {
         props.showSidebar ?
         <div id="scheduleSidebar">
-          
+          <Typography variant="h4">Schedule Name</Typography>
+          <Typography variant="h5">Schedule Semester</Typography>
         </div>
         : null
       }

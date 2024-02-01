@@ -234,3 +234,25 @@
     grid-column: 1;
     grid-row: 1;
 }
+
+/* Mobile View */
+
+#mainContainer {
+    padding: 0;
+}
+
+#schedule-container {
+    display: grid;
+    grid-template: 1fr/1fr;
+}
+
+#schedule {
+    height: 100%;
+    grid-column: 1/2;
+    grid-row: 1/2;
+}
+
+#scheduleSidebar {
+    grid-column: 1/2;
+    grid-row: 1/2;
+}
