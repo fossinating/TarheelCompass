@@ -153,27 +153,29 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
     return (
       <div className="schedule-container">
         <div className="schedule-box">
-          <h2 className="day-indicator" style={{gridColumn: "2/3"}}>Sunday</h2>
-          <h2 className="day-indicator" style={{gridColumn: "3/4"}}>Monday</h2>
-          <h2 className="day-indicator" style={{gridColumn: "4/5"}}>Tuesday</h2>
-          <h2 className="day-indicator" style={{gridColumn: "5/6"}}>Wednesday</h2>
-          <h2 className="day-indicator" style={{gridColumn: "6/7"}}>Thursday</h2>
-          <h2 className="day-indicator" style={{gridColumn: "7/8"}}>Friday</h2>
-          <h2 className="day-indicator" style={{gridColumn: "8/9"}}>Saturday</h2>
-          {
-              [...Array(14).keys()].map((hour) => 
-                  <h2 key={hour} className="hour-indicator" style={{gridRow: (hour * 12 + 2).toString() + "/" + (hour * 12 + 3).toString()}}>{ ((hour + 8 - 1) % 12 + 1).toString() + ((hour + 8) > 11 ? " PM" : " AM") }</h2>
-              )
-          }
-          <div className="hour-background"></div>
-          
-          <div id="saturday" className="day-schedule">{dayClasses[0]}</div>
-          <div id="monday" className="day-schedule">{dayClasses[1]}</div>
-          <div id="tuesday" className="day-schedule">{dayClasses[2]}</div>
-          <div id="wednesday" className="day-schedule">{dayClasses[3]}</div>
-          <div id="thursday" className="day-schedule">{dayClasses[4]}</div>
-          <div id="friday" className="day-schedule">{dayClasses[5]}</div>
-          <div id="sunday" className="day-schedule">{dayClasses[6]}</div>
+          <div className="schedule">
+            <h2 className="day-indicator" style={{gridColumn: "2/3"}}>Sunday</h2>
+            <h2 className="day-indicator" style={{gridColumn: "3/4"}}>Monday</h2>
+            <h2 className="day-indicator" style={{gridColumn: "4/5"}}>Tuesday</h2>
+            <h2 className="day-indicator" style={{gridColumn: "5/6"}}>Wednesday</h2>
+            <h2 className="day-indicator" style={{gridColumn: "6/7"}}>Thursday</h2>
+            <h2 className="day-indicator" style={{gridColumn: "7/8"}}>Friday</h2>
+            <h2 className="day-indicator" style={{gridColumn: "8/9"}}>Saturday</h2>
+            {
+                [...Array(14).keys()].map((hour) => 
+                    <h2 key={hour} className="hour-indicator" style={{gridRow: (hour * 12 + 2).toString() + "/" + (hour * 12 + 3).toString()}}>{ ((hour + 8 - 1) % 12 + 1).toString() + ((hour + 8) > 11 ? " PM" : " AM") }</h2>
+                )
+            }
+            <div className="hour-background"></div>
+            
+            <div id="saturday" className="day-schedule">{dayClasses[0]}</div>
+            <div id="monday" className="day-schedule">{dayClasses[1]}</div>
+            <div id="tuesday" className="day-schedule">{dayClasses[2]}</div>
+            <div id="wednesday" className="day-schedule">{dayClasses[3]}</div>
+            <div id="thursday" className="day-schedule">{dayClasses[4]}</div>
+            <div id="friday" className="day-schedule">{dayClasses[5]}</div>
+            <div id="sunday" className="day-schedule">{dayClasses[6]}</div>
+          </div>
       </div>
       {
         props.showSidebar ?
