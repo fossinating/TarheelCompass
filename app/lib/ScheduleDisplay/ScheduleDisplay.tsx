@@ -196,7 +196,7 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
             </div>
             <div className="days">
               { [...Array(daysShown).keys()].map((dayIndex) => 
-                <div className={"day " + dayStrings[earliestDay+dayIndex]}>
+                <div className={"day " + dayStrings[earliestDay+dayIndex]} key={dayIndex}>
                   <div className="date">{dayStrings[earliestDay+dayIndex]}</div>
                   <div className="classes">{dayClasses[earliestDay+dayIndex]}</div>
                 </div>
