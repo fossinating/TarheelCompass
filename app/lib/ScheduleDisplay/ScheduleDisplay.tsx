@@ -19,14 +19,14 @@ function ClassCard(props: {classData: {course: {code: string}, classSection: str
   return (
     <Card className="class-card" style={{gridRow: ((props.schedule.startTime - 480) / 5).toString() + "/" + ((props.schedule.endTime - 480) / 5).toString(), backgroundColor: "hsl(" + Math.round(360*(props.classIndex/(props.classCount))) + " 80% 80%)"}}>
       <CardActionArea onClick={props.setSelectedClass !== undefined ? () => (props.setSelectedClass as (index: number) => void)(props.classIndex) : undefined}>
-        <CardContent>
-          <Typography variant="h5" component="div">
+        <CardContent style={{padding: "4px"}}>
+          <Typography variant="h6" component="div">
             {props.classData.course.code} - {props.classData.classSection}
           </Typography>
-          <Typography sx={{ mb: 1.5 }} color="text.secondary">
+          <Typography sx={{ mb: .5 }} color="text.secondary">
             {props.schedule.location}
           </Typography>
-          <Typography sx={{ mb: 1.5 }} color="text.secondary">
+          <Typography sx={{ mb: .5 }} color="text.secondary">
           {readableTime(props.schedule.startTime)} - {readableTime(props.schedule.endTime)}
           </Typography>
         </CardContent>
@@ -96,7 +96,7 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
 
   const [selectedClass, setSelectedClass] = React.useState<number>(-1);
 
-  const [earliestDay, setEarliestDay] = React.useState<number>(2);
+  const [earliestDay, setEarliestDay] = React.useState<number>(1);
   const [daysShown, setDaysShown] = React.useState<number>(1);
 
   // Swipe code ! (stolen from https://stackoverflow.com/questions/70612769/how-do-i-recognize-swipe-events-in-react)
