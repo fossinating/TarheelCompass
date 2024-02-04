@@ -50,15 +50,10 @@ export default function PersistentDrawerRight() {
 
   if (schedules != undefined) {
     return (
-      <Box id="schedulePageLayoutContainer" style={{height:"100%"}}>
-        <ScheduleDisplay scheduleData={schedules[currentScheduleIndex]} showSidebar={true} />
-      </Box>
+      <ScheduleDisplay scheduleData={schedules[currentScheduleIndex]} showSidebar={true} />
     );
   } else {
-    return (
-      <Box id="schedulePageLayoutContainer" style={{height:"100%"}}>
-        <CircularProgress />
-      </Box>
+    return (<CircularProgress />
     );
   }
 }

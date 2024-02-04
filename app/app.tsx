@@ -3,6 +3,7 @@
 import CalendarViewWeekIcon from '@mui/icons-material/CalendarViewWeek';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
+import { unstable_useEnhancedEffect } from '@mui/material';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -14,6 +15,7 @@ import ListItemText from '@mui/material/ListItemText';
 import { createTheme, styled } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import { BlockList } from 'net';
 import { useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
@@ -27,7 +29,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
   open?: boolean;
 }>(({ theme, open }) => ({
   flexGrow: 1,
-  padding: theme.spacing(3),
+  /*padding: "0 " + theme.spacing(1),*/
   transition: theme.transitions.create('margin', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -71,7 +73,8 @@ const AppBar = styled(MuiAppBar, {
   transition: theme.transitions.create(['margin', 'width'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
-  })
+  }),
+  position: "unset"
 }));
 
 interface NavDrawerProps{
@@ -136,9 +139,11 @@ export default function App({
               </Toolbar>
             </AppBar>
             <NavDrawer open={open} />
-            <Main id="mainContainer" open={open}>
-              {children}
-            </Main>
+            <div id="main-wrapper">
+              <Main id="main-container" open={open}>
+                {children}
+              </Main>
+            </div>
           </Box>
         </>
     )

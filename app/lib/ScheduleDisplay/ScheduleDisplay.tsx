@@ -17,7 +17,7 @@ import "./ScheduleDisplay.css";
 */
 function ClassCard(props: {classData: {course: {code: string}, classSection: string, title: string, hours: number}, schedule: {location: string, instructors: Array<{name: string}>, startTime: number, endTime: number}, classIndex: number, classCount: number, setSelectedClass?: (index: number) => void }) {
   return (
-    <Card style={{gridRow: ((props.schedule.startTime - 480) / 5).toString() + "/" + ((props.schedule.endTime - 480) / 5).toString(), backgroundColor: "hsl(" + Math.round(360*(props.classIndex/(props.classCount))) + " 80% 80%)"}}>
+    <Card className="class-card" style={{gridRow: ((props.schedule.startTime - 480) / 5).toString() + "/" + ((props.schedule.endTime - 480) / 5).toString(), backgroundColor: "hsl(" + Math.round(360*(props.classIndex/(props.classCount))) + " 80% 80%)"}}>
       <CardActionArea onClick={props.setSelectedClass !== undefined ? () => (props.setSelectedClass as (index: number) => void)(props.classIndex) : undefined}>
         <CardContent>
           <Typography variant="h5" component="div">
@@ -96,6 +96,37 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
 
   const [selectedClass, setSelectedClass] = React.useState<number>(-1);
 
+  const [earliestDay, setEarliestDay] = React.useState<number>(2);
+  const [daysShown, setDaysShown] = React.useState<number>(1);
+
+  // Swipe code ! (stolen from https://stackoverflow.com/questions/70612769/how-do-i-recognize-swipe-events-in-react)
+
+  const touchStart = React.useRef<null|number>(null)
+  const touchEnd = React.useRef<null|number>(null)
+
+  // the required distance between touchStart and touchEnd to be detected as a swipe
+  const minSwipeDistance = 50 
+
+  const onTouchStart = (event: React.TouchEvent) => {
+    touchEnd.current = (null) // otherwise the swipe is fired even with usual touch events
+    touchStart.current = (event.targetTouches[0].clientX)
+  }
+
+  const onTouchMove = (event: React.TouchEvent) => touchEnd.current = (event.targetTouches[0].clientX)
+
+  const onTouchEnd = () => {
+    if (!touchStart.current || !touchEnd.current) return
+    const distance = touchStart.current - touchEnd.current
+    const isLeftSwipe = distance > minSwipeDistance
+    const isRightSwipe = distance < -minSwipeDistance
+    if (isLeftSwipe) {
+      setEarliestDay(Math.min(earliestDay + 1, 7-daysShown))
+    } else if (isRightSwipe) {
+      setEarliestDay(Math.max(earliestDay - 1, 0))
+    }
+    // add your conditional logic here
+  }
+
   // Hook for this graphql query, done lazily so we can call it multiple times as schedule changes
   const [ getClasses, { loading, error, data }] = useLazyQuery(props.showSidebar ? GET_CLASSES_FULL : GET_CLASSES);
   // Hook for the split of each day's worth of classes
@@ -104,13 +135,13 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
   // Call the graphql query whenever the schedule updates
   // I should be making this more efficient at some point and not be totally reliant on caching from the graphql library I'm using
   React.useEffect(() => {
-    console.log("hello", props.scheduleData);
     if (props.scheduleData) {
       getClasses({variables: {class_numbers: props.scheduleData.classNumbers, term: props.scheduleData.term}})
     }
   }, [props.scheduleData])
 
   const dayIndices = ["Su", "M", "Tu", "W", "Th", "F", "Sa"]
+  const dayStrings = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
 
   // Effect for when data returns from the graphql query
@@ -153,31 +184,29 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
     return (
       <div className="schedule-container">
         <div className="schedule-box">
-          <h2 className="day-indicator" style={{gridColumn: "2/3"}}>Sunday</h2>
-          <h2 className="day-indicator" style={{gridColumn: "3/4"}}>Monday</h2>
-          <h2 className="day-indicator" style={{gridColumn: "4/5"}}>Tuesday</h2>
-          <h2 className="day-indicator" style={{gridColumn: "5/6"}}>Wednesday</h2>
-          <h2 className="day-indicator" style={{gridColumn: "6/7"}}>Thursday</h2>
-          <h2 className="day-indicator" style={{gridColumn: "7/8"}}>Friday</h2>
-          <h2 className="day-indicator" style={{gridColumn: "8/9"}}>Saturday</h2>
-          {
-              [...Array(14).keys()].map((hour) => 
-                  <h2 key={hour} className="hour-indicator" style={{gridRow: (hour * 12 + 2).toString() + "/" + (hour * 12 + 3).toString()}}>{ ((hour + 8 - 1) % 12 + 1).toString() + ((hour + 8) > 11 ? " PM" : " AM") }</h2>
-              )
-          }
-          <div className="hour-background"></div>
-          
-          <div id="saturday" className="day-schedule">{dayClasses[0]}</div>
-          <div id="monday" className="day-schedule">{dayClasses[1]}</div>
-          <div id="tuesday" className="day-schedule">{dayClasses[2]}</div>
-          <div id="wednesday" className="day-schedule">{dayClasses[3]}</div>
-          <div id="thursday" className="day-schedule">{dayClasses[4]}</div>
-          <div id="friday" className="day-schedule">{dayClasses[5]}</div>
-          <div id="sunday" className="day-schedule">{dayClasses[6]}</div>
+          <div className={"schedule " + (daysShown == 1 ? "one-day" : daysShown == 3 ? "three-day" : daysShown == 5 ? "five-day" : "seven-day")}
+             onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+            <div className="hour-labels">
+              <div className="spacer" />
+              {
+                [...Array(14).keys()].map((hour) => 
+                    <div key={hour} className="hour-label">{ ((hour + 8 - 1) % 12 + 1).toString() + ((hour + 8) > 11 ? " PM" : " AM") }</div>
+                )
+              }
+            </div>
+            <div className="days">
+              { [...Array(daysShown).keys()].map((dayIndex) => 
+                <div className={"day " + dayStrings[earliestDay+dayIndex]}>
+                  <div className="date">{dayStrings[earliestDay+dayIndex]}</div>
+                  <div className="classes">{dayClasses[earliestDay+dayIndex]}</div>
+                </div>
+              )}
+            </div>
+          </div>
       </div>
       {
         props.showSidebar ?
-        <div id="scheduleSidebar">
+        <div className="schedule-sidebar">
           <Typography variant="h4">Schedule Name</Typography>
           <Typography variant="h5">Schedule Semester</Typography>
         </div>
