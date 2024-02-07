@@ -1,12 +1,12 @@
 "use client"
 import { useLazyQuery } from "@apollo/client";
-import { Card, CardActionArea, CardContent, CircularProgress, Typography } from "@mui/material";
+import { Card, CardActionArea, CardContent, CircularProgress, IconButton, Typography } from "@mui/material";
 import * as React from 'react';
 import { gql } from "src/__generated__";
 import { readableTime, titleCase } from "../Common";
 import { Schedule } from '../redux';
 import "./ScheduleDisplay.css";
-
+import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
 
 /*
   Class Card
@@ -95,6 +95,7 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
 `)
 
   const [selectedClass, setSelectedClass] = React.useState<number>(-1);
+  const [sidebarExpanded, setSidebarExpanded] = React.useState<boolean>(false);
 
   const [earliestDay, setEarliestDay] = React.useState<number>(1);
   const [daysShown, setDaysShown] = React.useState<number>(1);
@@ -125,6 +126,10 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
       setEarliestDay(Math.max(earliestDay - 1, 0))
     }
     // add your conditional logic here
+  }
+
+  const sidebarExpandClick = () => {
+    setSidebarExpanded(!sidebarExpanded);
   }
 
   // Hook for this graphql query, done lazily so we can call it multiple times as schedule changes
@@ -163,7 +168,7 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
             dayCode = classSchedule.days.substring(i, i+2);
             i++; // skip ahead one index so as to not double process the u / h
           }
-          //console.log(classSchedule, dayCode, i)
+          console.log(newDayClasses, dayCode)
           //console.log("jj", classCount, data.classes.length)
           // Create a new class card entry and shove it into the day assigned by the daycode
           newDayClasses[dayIndices.indexOf(dayCode)].push(
@@ -206,9 +211,12 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
       </div>
       {
         props.showSidebar ?
-        <div className="schedule-sidebar">
-          <Typography variant="h4">Schedule Name</Typography>
-          <Typography variant="h5">Schedule Semester</Typography>
+        <div className={"schedule-sidebar" + (sidebarExpanded ? " expanded" : "")}>
+          <Typography className="schedule-name">Schedule Name</Typography>
+          <Typography className="schedule-semester">Spring 2024</Typography>
+          <IconButton className="sidebar-expand-btn" onClick={sidebarExpandClick}>
+            <ExpandCircleDownIcon />
+          </IconButton>
         </div>
         : null
       }
