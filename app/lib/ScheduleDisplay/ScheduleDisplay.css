@@ -6,8 +6,32 @@
 
 .schedule-sidebar {
     overflow: clip;
-    background-color: rgb(110, 168, 255);
+    background-color: rgb(158, 158, 158);
+    border-radius: 5px 5px 0 0;
+    display: grid;
+    grid-template-columns: auto auto auto;
 }
+
+#schedule-name {
+    font-size: 2em;
+}
+
+.schedule-name, .schedule-semester {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.sidebar-expand-btn {
+    transform: rotate(180deg);
+    transition: transform 1s;
+}
+
+.schedule-sidebar.expanded .sidebar-expand-btn {
+    transform: rotate(0);
+}
+
 
 /*
 
