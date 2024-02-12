@@ -16,13 +16,16 @@
     font-size: 1.5em;
     padding: 0 .3rem 0 0.6rem;
     text-align: center;
+    overflow: clip;
+    text-overflow: ellipsis;
 }
 
 .schedule-semester {
     border-left: var(--primary-text-color) solid 2px;
     margin: auto 0;
-    padding: .1rem 0;
+    padding: 0;
     padding-left: 0.3rem;
+    font-size: 1.2em;
 }
 
 .schedule-name, .schedule-semester {
