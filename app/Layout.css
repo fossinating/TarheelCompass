@@ -58,3 +58,7 @@
 html, body, #root, #layoutContainer {
     height: 100%;
 }
+
+body {
+    --primary-text-color: rgba(0, 0, 0, 0.85);
+}

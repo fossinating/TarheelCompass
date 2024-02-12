@@ -212,8 +212,8 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
       {
         props.showSidebar ?
         <div className={"schedule-sidebar" + (sidebarExpanded ? " expanded" : "")}>
-          <Typography className="schedule-name">Schedule Name</Typography>
-          <Typography className="schedule-semester">Spring 2024</Typography>
+          <span className="schedule-name">Schedule Name</span>
+          <span className="schedule-semester">Spring 2024</span>
           <IconButton className="sidebar-expand-btn" onClick={sidebarExpandClick}>
             <ExpandCircleDownIcon />
           </IconButton>
