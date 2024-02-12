@@ -9,27 +9,37 @@
     background-color: rgb(158, 158, 158);
     border-radius: 5px 5px 0 0;
     display: grid;
-    grid-template-columns: auto auto auto;
+    grid-template-columns: auto 1fr 3rem;
 }
 
-#schedule-name {
-    font-size: 2em;
+.schedule-name {
+    font-size: 1.5em;
+    padding: 0 .3rem 0 0.6rem;
+    text-align: center;
+}
+
+.schedule-semester {
+    border-left: var(--primary-text-color) solid 2px;
+    margin: auto 0;
+    padding: .1rem 0;
+    padding-left: 0.3rem;
 }
 
 .schedule-name, .schedule-semester {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     white-space: nowrap;
+    color: var(--primary-text-color);
 }
 
-.sidebar-expand-btn {
+.sidebar-expand-btn > svg {
     transform: rotate(180deg);
-    transition: transform 1s;
+    transition: transform .5s linear;
 }
 
-.schedule-sidebar.expanded .sidebar-expand-btn {
-    transform: rotate(0);
+.schedule-sidebar.expanded .sidebar-expand-btn > svg{
+    transform: rotate(360deg);
 }
 
 
