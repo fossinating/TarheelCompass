@@ -1,7 +1,7 @@
 import { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
-  schema: 'https://api.tarheelcompass.com/graphql',
+  schema: process.env.NEXT_PUBLIC_API_PATH + "/graphql",
   documents: ['./app/**/*.ts?(x)'],
   generates: {
     './src/__generated__/': {

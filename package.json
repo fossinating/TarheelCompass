@@ -6,8 +6,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "compile": "graphql-codegen",
-    "watch": "graphql-codegen -w",
+    "compile": "graphql-codegen --require dotenv/config",
+    "watch": "graphql-codegen --require dotenv/config -w",
     "db:push": "drizzle-kit push:mysql --config=drizzle.config.ts"
   },
   "dependencies": {

@@ -23,7 +23,7 @@ export const updateUserData = createAppAsyncThunk(
 export const updateTerms = createAppAsyncThunk(
   'system/updateTerms',
   async () => {
-    let res = await fetch("https://api.tarheelcompass.com/terms", {
+    let res = await fetch(process.env.NEXT_PUBLIC_API_PATH + "/terms", {
         method: "GET",
         headers: {
           'content-type': 'application/json;charset=UTF-8',

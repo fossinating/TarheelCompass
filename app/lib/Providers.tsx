@@ -29,7 +29,7 @@ export const Providers = (props: React.PropsWithChildren) => {
         setClient(
           new ApolloClient({
   
-            uri: 'https://api.tarheelcompass.com/graphql',
+            uri: process.env.NEXT_PUBLIC_API_PATH + '/graphql',
             cache,
           }),
         );
