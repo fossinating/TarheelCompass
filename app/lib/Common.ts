@@ -75,10 +75,10 @@ export function useTerms(): [TermData[]|undefined, string|undefined, Dispatch<Se
     const [term, setTerm] = useState<string | undefined>(defaultTerm);
 
     useEffect(() => {
-      if (term === undefined) {
+      if (term === undefined || term === null) {
         setTerm(defaultTerm)
       }
-    },[defaultTerm])
+    },[defaultTerm, term])
 
     return [terms, term, setTerm];
 }
