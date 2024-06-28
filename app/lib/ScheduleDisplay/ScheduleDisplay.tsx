@@ -95,7 +95,7 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
 `)
 
   const [selectedClass, setSelectedClass] = React.useState<number>(-1);
-  const [sidebarExpanded, setSidebarExpanded] = React.useState<boolean>(false);
+  const [expandedDetails, setExpandedDetails] = React.useState<boolean>(false);
 
   const [earliestDay, setEarliestDay] = React.useState<number>(1);
   const [daysShown, setDaysShown] = React.useState<number>(1);
@@ -128,8 +128,8 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
     // add your conditional logic here
   }
 
-  const sidebarExpandClick = () => {
-    setSidebarExpanded(!sidebarExpanded);
+  const expandDetailsClick = () => {
+    setExpandedDetails(!expandedDetails);
   }
 
   // Hook for this graphql query, done lazily so we can call it multiple times as schedule changes
@@ -182,12 +182,13 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
     setDayClasses(newDayClasses);
   }, [data])
 
-
-  if (loading) {
+  if (props.scheduleData === undefined) {
+    return (<h1>Invalid Schedule!</h1>)
+  } else if (loading) {
     return (<CircularProgress />)
   } else {
     return (
-      <div className="schedule-container">
+      <div className={"schedule-container" + (expandedDetails ? " expanded-details" : "")}>
         <div className="schedule-box">
           <div className={"schedule " + (daysShown == 1 ? "one-day" : daysShown == 3 ? "three-day" : daysShown == 5 ? "five-day" : "seven-day")}
              onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
@@ -211,12 +212,15 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
       </div>
       {
         props.showSidebar ?
-        <div className={"schedule-sidebar" + (sidebarExpanded ? " expanded" : "")}>
-          <span className="schedule-name">Schedule Name</span>
-          <span className="schedule-semester">Spring 2024</span>
-          <IconButton className="sidebar-expand-btn" onClick={sidebarExpandClick}>
-            <ExpandCircleDownIcon />
-          </IconButton>
+        <div className="schedule-details">
+          <div className="schedule-details-topbar">
+            <span className="schedule-name">{props.scheduleData.name}</span>
+            <span className="schedule-semester">{props.scheduleData.term}</span>
+            <IconButton className="details-expand-btn" onClick={expandDetailsClick}>
+              <ExpandCircleDownIcon />
+            </IconButton>
+          </div>
+          <span></span>
         </div>
         : null
       }
