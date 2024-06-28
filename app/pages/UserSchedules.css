@@ -1,0 +1,12 @@
+#no-schedules-prompt {
+    display: flex;
+    margin: auto;
+}
+
+.box-title {
+    font-size: 2em;
+}
+
+.box-content {
+    font-size: 1.3em;
+}

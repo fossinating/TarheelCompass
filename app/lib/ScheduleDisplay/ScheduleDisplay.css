@@ -1,15 +1,26 @@
+/*
+
+Mobile-friendly view of the schedule display view
+
+*/
+
 .schedule-container {
     display: grid;
     grid-template-rows: 1fr 3rem;
     height: 100%;
 }
 
-.schedule-sidebar {
+.schedule-details {
+    min-height: 3rem;
     overflow: clip;
     background-color: rgb(158, 158, 158);
     border-radius: 5px 5px 0 0;
+}
+
+.schedule-details-topbar {
     display: grid;
     grid-template-columns: auto 1fr 3rem;
+    height: 3rem;
 }
 
 .schedule-name {
@@ -36,12 +47,22 @@
     color: var(--primary-text-color);
 }
 
-.sidebar-expand-btn > svg {
+.details-expand-btn > svg {
     transform: rotate(180deg);
     transition: transform .5s linear;
 }
 
-.schedule-sidebar.expanded .sidebar-expand-btn > svg{
+/* 
+
+Changes for when the details pane is expanded (still mobile view)
+
+*/
+
+.schedule-container.expanded-details {
+    grid-template-rows: 1fr auto;
+}
+
+.schedule-container.expanded-details .details-expand-btn > svg{
     transform: rotate(360deg);
 }
 
