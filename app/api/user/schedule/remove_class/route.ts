@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/backend_lib/auth';
 import { scheduledClasses, schedules } from '@/backend_lib/db/schema';
-import { db } from '@/backend_lib/db/drizzle';
+import { createDB } from '@/backend_lib/db/drizzle';
 import { and, eq } from 'drizzle-orm';
+import { Env } from '@/api/test/route';
 
 export const runtime = 'edge';
 
@@ -11,13 +12,16 @@ export interface RemoveClassParams {
     scheduleID: string;
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest, env: Env) {
     const session = await auth()
     if (session && session?.user) {
+        const db = createDB(env.DB);
+
         let data: RemoveClassParams = await req.json();
     
         const schedule = await db.query.schedules.findFirst({
-            where: (schedules, {eq, and}) => and(eq(schedules.id, data.scheduleID), eq(schedules.ownerID, session.user.id))
+           // where: (schedules, {eq, and}) => and(eq(schedules.id, data.scheduleID), eq(schedules.ownerID, session.user.id))
+            where: (schedules, {eq, and}) => and(eq(schedules.id, data.scheduleID))
         })
 
         if (schedule == null) {
