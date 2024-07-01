@@ -1,5 +1,6 @@
 name = "tarheel-compass"
 compatibility_flags = ["nodejs_compat"]
+compatibility_date = "2022-11-07"
 pages_build_output_dir = ".vercel/output/static"
 
 [[d1_databases]]
