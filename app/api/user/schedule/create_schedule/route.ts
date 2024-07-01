@@ -15,6 +15,8 @@ export async function POST(req: NextRequest) {
     const session = await auth()
     if (session && session?.user) {
 
+        const db = createDB(env.DB);
+
         let data: CreateScheduleParams = await req.json();
 
         if (data.id.length != 36) {

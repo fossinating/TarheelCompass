@@ -1,16 +1,14 @@
-import { Theme } from '@auth/core/types';
 import NextAuth from 'next-auth';
-import { DrizzleAdapter } from "@auth/drizzle-adapter"
-import { db } from "@/backend_lib/db/drizzle"
-import Google from "@auth/core/providers/google"
+import { D1Adapter } from "@auth/d1-adapter"
+import Google from "next-auth/providers/google"
 import { env } from 'process';
 
 export const runtime = 'edge';
 
 export const { handlers: {GET, POST}, auth } = NextAuth({
-  adapter: DrizzleAdapter(db),
+  adapter: D1Adapter(env.db),
   providers: [
-    Google({ clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET })
+    Google
   ],
   callbacks: {
     async session({ session, token, user }) {
