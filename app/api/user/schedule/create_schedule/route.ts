@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/backend_lib/auth';
-import { db } from '@/backend_lib/db/drizzle';
 import { schedules } from '@/backend_lib/db/schema';
+import { Env } from '@/api/test/route';
+import { createDB } from '@/backend_lib/db/drizzle';
 
 export const runtime = 'edge';
 
@@ -11,7 +12,7 @@ export interface CreateScheduleParams {
     term: string;
 }
  
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest, env: Env) {
     const session = await auth()
     if (session && session?.user) {
 

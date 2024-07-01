@@ -3,10 +3,9 @@ import { auth } from '@/backend_lib/auth';
 import { eq } from 'drizzle-orm';
 import { schedules } from '@/backend_lib/db/schema';
 import { createDB } from '@/backend_lib/db/drizzle';
-import { DrizzleD1Database } from 'drizzle-orm/d1';
 
 export interface Env {
-  DB: DrizzleD1Database;
+  DB: D1Database;
 }
 
 

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/backend_lib/auth';
-import { db } from '@/backend_lib/db/drizzle';
+import { createDB } from '@/backend_lib/db/drizzle';
 import { eq, and } from 'drizzle-orm';
 import { scheduledClasses } from '@/backend_lib/db/schema';
+import { Env } from '../../route';
 
 export const runtime = 'edge';
 
@@ -11,9 +12,10 @@ export interface AddClassParams {
     classNumber: number
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest, env: Env) {
     const session = await auth()
     if (session && session?.user) {
+        const db = createDB(env.DB);
         let data: AddClassParams = await req.json();
     
         const schedule = await db.query.schedules.findFirst({

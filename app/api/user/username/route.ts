@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/backend_lib/auth';
-import { db } from '@/backend_lib/db/drizzle';
+import { createDB } from '@/backend_lib/db/drizzle';
 import { users } from '@/backend_lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { Env } from '../route';
 
 export const runtime = 'edge';
 
@@ -10,9 +11,10 @@ export interface ChangeUsernameParams {
     newUsername: string;
 }
  
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest, env: Env) {
     const session = await auth()
     if (session && session?.user && session.user?.email) {
+        const db = createDB(env.DB);
 
         let data: ChangeUsernameParams = await req.json();
         if (data?.newUsername && data.newUsername.length > 2 && data.newUsername.length <= 20 && data.newUsername.match("^[a-z0-9][a-z0-9\_.\-]+[a-z0-9]$") !== null) {
