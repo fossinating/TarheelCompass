@@ -38,7 +38,7 @@ export default function OnboardingDialog() {
               } else {
                 setLoading(false);
                 try {
-                  let data = await response.json();
+                  let data = await response.json() as {errMessage: string};
                   setErrMessage(data?.errMessage ? data.errMessage : "An unknown error occured, if this continues please contact support.");
                 } catch {
                   setErrMessage("An unknown error occured, if this continues please contact support.");
