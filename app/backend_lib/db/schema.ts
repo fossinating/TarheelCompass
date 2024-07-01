@@ -1,27 +1,21 @@
 import {
-  datetime,
   index,
   int,
-  mysqlTable,
+  sqliteTable,
   text,
-  timestamp,
   uniqueIndex,
-  varchar,
-  } from "drizzle-orm/mysql-core"
-  import type { AdapterAccount } from "@auth/core/adapters"
+  } from "drizzle-orm/sqlite-core"
+import type { AdapterAccount } from "next-auth/adapters"
 import { sql, relations } from "drizzle-orm"
   
-  export const users = mysqlTable("user", {
-    id: varchar("id", { length: 255 }).notNull().primaryKey(),
-    name: varchar("name", { length: 255 }),
-    email: varchar("email", { length: 255 }).notNull(),
-    emailVerified: timestamp("emailVerified", {
-      mode: "date",
-      fsp: 3
-    }).default(sql`now(3)`),
-    image: varchar('image', { length: 191 }),
-    created_at: timestamp('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
-    updated_at: timestamp('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`).onUpdateNow(),
+  export const users = sqliteTable("user", {
+    id: text("id").notNull().primaryKey(),
+    name: text("name"),
+    email: text("email").notNull(),
+    emailVerified: text("emailVerified").default(sql`now(3)`),
+    image: text('image'),
+    created_at: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+    updated_at: text('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`),
   },
   user => ({
     emailIndex: uniqueIndex('users__email__idx').on(user.email),
@@ -31,24 +25,24 @@ export const usersRelations = relations(users, ({ many }) => ({
 	schedules: many(schedules),
 }));
   
-  export const accounts = mysqlTable(
+  export const accounts = sqliteTable(
     "account",
     {
-      userId: varchar("userId", { length: 255 }).notNull(),
-      type: varchar("type", { length: 255 })
+      userId: text("userId").notNull(),
+      type: text("type")
         .$type<AdapterAccount["type"]>()
         .notNull(),
-      provider: varchar("provider", { length: 255 }).notNull(),
-      providerAccountId: varchar("providerAccountId", { length: 255 }).notNull(),
-      refresh_token: varchar("refresh_token", { length: 255 }),
-      access_token: varchar("access_token", { length: 255 }),
+      provider: text("provider").notNull(),
+      providerAccountId: text("providerAccountId").notNull(),
+      refresh_token: text("refresh_token"),
+      access_token: text("access_token"),
       expires_at: int("expires_at"),
-      token_type: varchar("token_type", { length: 255 }),
-      scope: varchar("scope", { length: 255 }),
+      token_type: text("token_type"),
+      scope: text("scope"),
       id_token: text("id_token"),
-      session_state: varchar("session_state", { length: 255 }),
-      created_at: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
-      updated_at: timestamp('updated_at').default(sql`CURRENT_TIMESTAMP`).onUpdateNow(),
+      session_state: text("session_state"),
+      created_at: text('created_at').default(sql`CURRENT_TIMESTAMP`),
+      updated_at: text('updated_at').default(sql`CURRENT_TIMESTAMP`),
     },
     (account) => ({
       providerProviderAccountIdIndex: uniqueIndex(
@@ -58,10 +52,10 @@ export const usersRelations = relations(users, ({ many }) => ({
     })
   )
   
-  export const sessions = mysqlTable("session", {
-    sessionToken: varchar("sessionToken", { length: 255 }).notNull().primaryKey(),
-    userId: varchar("userId", { length: 255 }).notNull(),
-    expires: timestamp("expires", { mode: "date" }).notNull(),
+  export const sessions = sqliteTable("session", {
+    sessionToken: text("sessionToken").notNull().primaryKey(),
+    userId: text("userId").notNull(),
+    expires: text("expires").notNull(),
   },
   session => ({
     sessionTokenIndex: uniqueIndex('sessions__sessionToken__idx').on(
@@ -70,12 +64,12 @@ export const usersRelations = relations(users, ({ many }) => ({
     userIdIndex: index('sessions__userId__idx').on(session.userId),
   }))
   
-  export const verificationTokens = mysqlTable(
+  export const verificationTokens = sqliteTable(
     "verificationToken",
     {
-      identifier: varchar("identifier", { length: 255 }).notNull(),
-      token: varchar("token", { length: 255 }).notNull(),
-      expires: timestamp("expires", { mode: "date" }).notNull()
+      identifier: text("identifier").notNull(),
+      token: text("token").notNull(),
+      expires: text("expires").notNull()
     },
     verificationToken => ({
       tokenIndex: uniqueIndex('verification_tokens__token__idx').on(
@@ -84,11 +78,11 @@ export const usersRelations = relations(users, ({ many }) => ({
     })
   )
   
-  export const scheduledClasses = mysqlTable(
+  export const scheduledClasses = sqliteTable(
     "scheduledClass",
     {
-      id: int("id").notNull().primaryKey().autoincrement(),
-      scheduleID: varchar("scheduleID", { length: 255 }).notNull(),
+      id: int("id").notNull().primaryKey(),
+      scheduleID: text("scheduleID").notNull(),
       classNumber: int("classNumber").notNull()
     }
   )
@@ -100,13 +94,13 @@ export const usersRelations = relations(users, ({ many }) => ({
     })
   }));
 
-  export const schedules = mysqlTable(
+  export const schedules = sqliteTable(
     "schedule",
     {
-      id: varchar('id', { length: 255 }).primaryKey().notNull(),
-      ownerID: varchar("ownerID", { length: 255 }).notNull(),
-      name: varchar("name", { length: 255 }).notNull(),
-      term: varchar("term", { length: 16 }).notNull()
+      id: text('id').primaryKey().notNull(),
+      ownerID: text("ownerID").notNull(),
+      name: text("name").notNull(),
+      term: text("term").notNull()
     }
   )
 

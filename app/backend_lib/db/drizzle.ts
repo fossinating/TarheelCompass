@@ -1,13 +1,6 @@
-import { drizzle } from 'drizzle-orm/planetscale-serverless';
-import { connect } from '@planetscale/database';
-import * as schema from './schema';
+import { drizzle, DrizzleD1Database } from 'drizzle-orm/d1';
+import * as schema from "./schema";
 
-const connection = connect({
-  url: process.env.DATABASE_URL,
-  fetch: (url: string, init) => {
-    delete (init as any)["cache"]; // Remove cache header
-    return fetch(url, init);
-  }
-});
-
-export const db = drizzle(connection, {schema});
+export function createDB(d1: DrizzleD1Database) {
+  return drizzle(d1, {schema});
+}
