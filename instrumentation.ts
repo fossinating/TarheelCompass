@@ -3,7 +3,6 @@ import { env } from "process"
  
 let migrated = false
 async function migrationHandle() {
-  console.log("migration handle")
   if (!migrated) {
     try {
       await up(env.db)
@@ -16,6 +15,6 @@ async function migrationHandle() {
 
 export function register() {
 
-  migrationHandle();
+  //migrationHandle();
   
 }
