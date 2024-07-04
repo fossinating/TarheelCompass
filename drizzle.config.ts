@@ -1,17 +1,33 @@
 // drizzle.config.ts
 
-import type { Config } from 'drizzle-kit';
+import { defineConfig } from "drizzle-kit";
 import 'dotenv/config';
+import { env } from "@/env";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL is missing');
-}
 
-export default {
-  schema: './app/backend_lib/db/schema.ts',
-  out: './app/backend_lib/db/migrations',
-  driver: 'mysql2',
-  dbCredentials: {
-    connectionString: process.env.DATABASE_URL,
-  },
-} satisfies Config;
+
+/*
+ * NOTE: Workaround to make drizzle studio work with D1.
+ * https://kevinkipp.com/blog/going-full-stack-on-astro-with-cloudflare-d1-and-drizzle/
+ * Github discussion: https://github.com/drizzle-team/drizzle-orm/discussions/1545#discussioncomment-8115423
+ */
+export default env.DB_LOCAL_PATH
+  ? defineConfig({
+      schema: './src/server/db/schema.ts',
+      dialect: 'sqlite',
+      dbCredentials: {
+        url: env.DB_LOCAL_PATH,
+      },
+    })
+  : defineConfig({
+      schema: './src/server/db/schema.ts',
+      out: './migrations',
+      driver: 'd1-http',
+      dialect: 'sqlite',
+      dbCredentials: {
+        accountId: env.CF_ACCOUNT_ID!,
+        token: env.CF_USER_API_TOKEN!,
+        databaseId:
+          env.NODE_ENV === 'preview' ? env.DB_PREVIEW_DATABASE_ID! : env.DB_PROD_DATABASE_ID!,
+      },
+    });
