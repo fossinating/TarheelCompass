@@ -11,10 +11,11 @@ database_id = "786d9e50-3cd0-4401-8cd2-7ba56a734a74"
 [env.production.vars]
 NEXTAUTH_URL="https://tarheelcompass.com"
 PUBLIC_URL="https://tarheelcompass.com"
+NEXT_PUBLIC_API_PATH="https://api.tarheelcompass.com"
 
 [env.preview.vars]
-NEXTAUTH_URL="https://staging.tarheelcompass.com"
-PUBLIC_URL="https://staging.tarheelcompass.com"
+NEXTAUTH_URL="https://preview.tarheelcompass.pages.dev"
+PUBLIC_URL="https://preview.tarheelcompass.pages.dev"
 
 [env.preview]
 name = "preview"
