@@ -63,9 +63,8 @@ export class ClassSchedule {
 }
 
 export interface TermData {
-  id: string;
+  id: number;
   name: string;
-  default?: boolean;
 }
 
 export function useTerms(): [TermData[]|undefined, string|undefined, Dispatch<SetStateAction<string|undefined>>] {
