@@ -16,7 +16,7 @@ NEXT_PUBLIC_API_PATH="https://api.tarheelcompass.com"
 [env.preview.vars]
 NEXTAUTH_URL="https://preview.tarheelcompass.pages.dev"
 PUBLIC_URL="https://preview.tarheelcompass.pages.dev"
-NEXT_PUBLIC_API_PATH="https://api.tarheelcompass.com"
+NEXT_PUBLIC_API_PATH="https://api.preview.tarheelcompass.com"
 
 [env.preview]
 name = "preview"
