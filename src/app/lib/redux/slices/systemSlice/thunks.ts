@@ -30,16 +30,21 @@ export const updateTerms = createAppAsyncThunk(
         }
       })
 
-    let data: {terms: Array<TermData>, defaultTerm: number} = {terms: await res.json(), defaultTerm: -1};
+    let data: {terms: Array<TermData>, defaultTerm: string} = {terms: await res.json(), defaultTerm: ""};
 
     // For some reason the values stay undefined for a while??? no clue why but its 7 am and i shouldve been asleep a while ago.
 
-    data.terms.forEach(term => {
-      if (term.id > data.defaultTerm) {
-        data.defaultTerm = term.id;
-        return data;
+    let default_term: TermData | undefined = undefined;
+
+    for (let term of data.terms) {
+      if (default_term == undefined || (term != undefined && term.id > default_term.id)) {
+        default_term = term;
       }
-    });
+    }
+
+    if (default_term) {
+      data.defaultTerm = default_term.name;
+    }
 
     // The value we return becomes the `fulfilled` action payload
     return data
