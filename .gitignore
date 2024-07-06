@@ -284,3 +284,4 @@ yarn-error.log*
 next-env.d.ts
 nextjs/.vscode/settings.json
 *.Identifier
+.wrangler/

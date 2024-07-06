@@ -30,7 +30,8 @@ export default function Page() {
         classSection,
         title,
         schedules {
-          location,
+          building,
+          room,
           instructors {
             name
           }
@@ -40,7 +41,7 @@ export default function Page() {
         },
         enrollmentTotal,
         enrollmentCap,
-        hours,
+        units,
         lastUpdatedAt
       }
     }
@@ -49,7 +50,7 @@ export default function Page() {
     GET_CLASSES,{ variables: {term: term as string, code: codeRef.current?.value as string} });
 
   const handleChange = (event: SelectChangeEvent) => {
-    setTerm(event.target.value as string);
+    setTerm(event.target.value as string); 
   };
 
   const convertTermName = (name: string|undefined) => {
@@ -90,7 +91,7 @@ export default function Page() {
               >
                 {terms != undefined && terms.length > 0 ? 
                   terms.map((term) =>
-                    <MenuItem key={term.id} value={term.id}>{convertTermName(term.name)}</MenuItem>
+                    <MenuItem key={term.id} value={term.name}>{convertTermName(term.name)}</MenuItem>
                   )
                   : <MenuItem value="Loading">Loading</MenuItem>
                 }
