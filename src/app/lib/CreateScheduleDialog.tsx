@@ -72,7 +72,7 @@ export default function CreateScheduleDialog(props: {term?: string, open: boolea
                                 label="Term"
                                 onChange={handleChange}>
                                 {terms != undefined && terms.length > 0 ? 
-                                    terms.map((term) => <MenuItem key={term.id} value={term.id}>{term.name}</MenuItem>)
+                                    terms.map((term) => <MenuItem key={term.id} value={term.name}>{term.name}</MenuItem>)
                                 : <MenuItem value="Loading">Loading</MenuItem>
                                 }
                             </Select>

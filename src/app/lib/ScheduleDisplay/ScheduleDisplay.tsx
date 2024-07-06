@@ -15,7 +15,11 @@ import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
 
 
 */
-function ClassCard(props: {classData: {course: {code: string}, classSection: string, title: string, hours: number}, schedule: {location: string, instructors: Array<{name: string}>, startTime: number, endTime: number}, classIndex: number, classCount: number, setSelectedClass?: (index: number) => void }) {
+function ClassCard(props: {classData: {course: {code: string}, classSection: string, title: string, units: string}, schedule: {building?: string | null | undefined, room?: string | null | undefined, instructors: Array<{name: string}>, startTime?: number | null | undefined, endTime?: number | null | undefined}, classIndex: number, classCount: number, setSelectedClass?: (index: number) => void }) {
+  // Check if either startTime or endTime is undefined/null, return null in that case(there shouldn't be any card for this schedule)
+  if (!!!props.schedule.startTime || !!!props.schedule.endTime) {
+    return null;
+  }
   return (
     <Card className="class-card" style={{gridRow: ((props.schedule.startTime - 480) / 5).toString() + "/" + ((props.schedule.endTime - 480) / 5).toString(), backgroundColor: "hsl(" + Math.round(360*(props.classIndex/(props.classCount))) + " 80% 80%)"}}>
       <CardActionArea onClick={props.setSelectedClass !== undefined ? () => (props.setSelectedClass as (index: number) => void)(props.classIndex) : undefined}>
@@ -24,7 +28,7 @@ function ClassCard(props: {classData: {course: {code: string}, classSection: str
             {props.classData.course.code} - {props.classData.classSection}
           </Typography>
           <Typography sx={{ mb: .5 }} color="text.secondary">
-            {props.schedule.location}
+            {(props.schedule.building && props.schedule.room) ? (props.schedule.building + " " + props.schedule.room) : "Unknown location"}
           </Typography>
           <Typography sx={{ mb: .5 }} color="text.secondary">
           {readableTime(props.schedule.startTime)} - {readableTime(props.schedule.endTime)}
@@ -55,7 +59,8 @@ export default function ScheduleDisplay(props: {scheduleData: {classNumbers: Arr
       classSection,
       title,
       schedules {
-        location,
+        building,
+        room,
         instructors {
           name
         }
@@ -63,7 +68,7 @@ export default function ScheduleDisplay(props: {scheduleData: {classNumbers: Arr
         startTime,
         endTime
       },
-      hours
+      units
     }
   }
 `)
@@ -78,7 +83,8 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
     classSection,
     title,
     schedules {
-      location,
+      building,
+      room,
       instructors {
         name
       }
@@ -88,7 +94,7 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
     },
     enrollmentTotal,
     enrollmentCap,
-    hours,
+    units,
     lastUpdatedAt
   }
 }
@@ -161,6 +167,9 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
     let classCount = 0;
     data?.classes.forEach((classData) => {
       classData.schedules.forEach((classSchedule) => {
+        if (classSchedule === undefined) {
+          return;
+        }
         for (let i = 0; i < classSchedule.days.length; i++) {
           let dayCode = classSchedule.days.substring(i, i+1)
           // Daycode is just M Tu W Th F Sa Su

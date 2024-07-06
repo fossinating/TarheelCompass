@@ -286,3 +286,4 @@ nextjs/.vscode/settings.json
 =======
 *.pdf
 >>>>>>> Stashed changes
+.wrangler/
