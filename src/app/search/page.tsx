@@ -5,7 +5,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { useRef, useState } from "react";
 import { gql } from "../../__generated__";
 import ClassDisplay from "../lib/ClassDisplay";
-import { SectionData, useTerms } from "../lib/Common";
+import { SectionData, titleCase, useTerms } from "../lib/Common";
 import "./Search.css";
 
 export interface SnackbarMessage {
@@ -30,7 +30,8 @@ export default function Page() {
         classSection,
         title,
         schedules {
-          location,
+          building,
+          room,
           instructors {
             name
           }
@@ -40,7 +41,7 @@ export default function Page() {
         },
         enrollmentTotal,
         enrollmentCap,
-        hours,
+        units,
         lastUpdatedAt
       }
     }
@@ -49,8 +50,21 @@ export default function Page() {
     GET_CLASSES,{ variables: {term: term as string, code: codeRef.current?.value as string} });
 
   const handleChange = (event: SelectChangeEvent) => {
-    setTerm(event.target.value as string);
+    setTerm(event.target.value as string); 
   };
+
+  const convertTermName = (name: string|undefined) => {
+    if (name == undefined) { 
+      return "Undefined Term";
+    }
+
+    const first_underscore = name.indexOf("_");
+    const first_bit = name.substring(0, first_underscore);
+    const last_bit = name.substring(first_underscore);
+
+
+    return titleCase(first_bit) + last_bit.replaceAll("_", " ");
+  }
 
   let class_numbers: Array<number> = [];
 
@@ -77,7 +91,7 @@ export default function Page() {
               >
                 {terms != undefined && terms.length > 0 ? 
                   terms.map((term) =>
-                    <MenuItem key={term.id} value={term.id}>{term.name}</MenuItem>
+                    <MenuItem key={term.id} value={term.name}>{convertTermName(term.name)}</MenuItem>
                   )
                   : <MenuItem value="Loading">Loading</MenuItem>
                 }

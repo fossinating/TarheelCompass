@@ -71,15 +71,16 @@ export interface ClassDisplayInfo {
   enrollmentCap?: number | null | undefined;
   lastUpdatedAt: Date;
   schedules: Array<{
-    location: string;
+    building?: string | null | undefined;
+    room?: string | null | undefined;
     instructors: Array<{
       name: string;
     }>
     days: string;
-    startTime: number;
-    endTime: number;
+    startTime?: number | null | undefined;
+    endTime?: number | null | undefined;
   }>
-  hours: number;
+  units: string;
 }
 
 const GET_CLASSES_SCHEDULE_DATA = gql(`
@@ -108,49 +109,73 @@ function ScheduleAdder(props: {classInfo: ClassDisplayInfo, schedule: Schedule, 
     }
   }
 
-  // I blame chatgpt if this doesnt work
-  const dayIndices: { [key: string]: number } = {
-    'M': 0,
-    'Tu': 1,
-    'W': 2,
-    'Th': 3,
-    'F': 4
-  };
-
   const { loading, error, data } = useQuery(GET_CLASSES_SCHEDULE_DATA, {
     variables: {class_numbers: props.schedule.classNumbers, term: props.classInfo.term}
   });
 
+  // Update the inSchedule and hasConflict on every update of the schedule (or class info, but that shouldn't change)
   React.useEffect(() => {
-    let foundSomething = false;
-    if (data) {
-      props.classInfo.schedules.forEach(blockSchedule => {
-        // Convert strings to sets of day indices
-        const blockDays = new Set(blockSchedule.days.split('').map(day => dayIndices[day]));
-        data.classes.forEach(element => {
-          if (element.classNumber === props.classInfo.classNumber) {
-            setInSchedule(true);
-            foundSomething = true;
-            return;
+    // Setup the function that gets called below
+    // Using this to allow for early returns
+    const updateState = () => {
+      if (data) {
+        // Go through every schedule for this class(referring to them as blockSchedule for some reason)
+        for (let blockSchedule of props.classInfo.schedules){
+          // If the startTime or endTime are undefined, skip this (block)schedule since there are no conflicts that could be found from this anyways.
+          if (!!!blockSchedule.startTime || !!!blockSchedule.endTime) {
+            break;
           }
-          element.schedules.forEach(schedule => {
-            if ((blockSchedule.startTime >= schedule.startTime && schedule.startTime >= blockSchedule.endTime) || 
-                (blockSchedule.startTime >= schedule.endTime && schedule.endTime >= blockSchedule.endTime)) {
-              const scheduleDays = new Set(schedule.days.split('').map(day => dayIndices[day]));
-              if ([...blockDays].some(day => scheduleDays.has(day))) {
-                setHasConflict(true);
-                foundSomething = true;
-                return;
+
+
+          // Convert the days string to an array of indices
+          // We remove all of the "T"s so we can reduce all days down to a single letter
+          const dayIndices: { [key: string]: number } = {
+            'M': 0,
+            'u': 1, // Would be "Tu"
+            'W': 2,
+            'h': 3, // Would be "Th"
+            'F': 4
+          };
+
+          const blockDays = new Set(blockSchedule.days.replaceAll("T", "").split('').map(day => dayIndices[day]));
+          for (let element of data.classes) {
+            if (element.classNumber === props.classInfo.classNumber) {
+              setInSchedule(true);
+              return;
+            }
+
+            for (let schedule of element.schedules) {
+              if (!!!schedule.startTime || !!!schedule.endTime) {
+                break;
+              }
+
+              // Check if there is overlap on the time, ignoring day to begin
+              // Doing this first because I believe comparing integers 4 times is faster than the set search
+              // This checks if either the start or end times of the schedule is between the start and end times of blockSchedule
+              if ((blockSchedule.startTime >= schedule.startTime && blockSchedule.startTime <= schedule.endTime) || 
+                  (blockSchedule.startTime >= schedule.endTime && blockSchedule.endTime <= schedule.endTime)) {
+                const scheduleDays = new Set(schedule.days.replaceAll("T", "").split('').map(day => dayIndices[day]));
+
+                // I'm going to be honest I think I took this from ChatGPT and I have no clue how this works
+                // But I believe it is (supposed to) check if any of the days from blockDays is inside scheduleDays
+                // Basically meaning that it checks if blockSchedule and schedule share days
+                if ([...blockDays].some(day => scheduleDays.has(day))) {
+                  // At this point the time overlaps and day overlaps, meaning there is conflict!
+                  setHasConflict(true);
+                  return;
+                }
               }
             }
-          });
-        });
-      })
-    }
-    if (!foundSomething) {
+          }
+        }
+      }
+
       setHasConflict(false);
       setInSchedule(false);
     }
+    
+    updateState();
+    
   }, [data, props.classInfo.classNumber, props.classInfo.schedules])
 
   return (
@@ -226,6 +251,18 @@ export default function ClassDisplay(props: { classInfo: ClassDisplayInfo }) {
     setCreateScheduleOpen(false);
   }
 
+  const stringifyTime = (startTime?: number | null | undefined, endTime?: number | null | undefined) => {
+    if (!!!startTime || !!!endTime) {
+      return "TBA";
+    }
+    return (
+      <>
+        {(Math.floor(startTime / 60) - 1) % 12 + 1}:{(startTime%60).toString().padStart(2, "0")} {startTime >= 13*60 ? "PM" : "AM"} - 
+        {(Math.floor(endTime / 60) - 1) % 12 + 1}:{(endTime%60).toString().padStart(2, "0")} {endTime >= 13*60 ? "PM" : "AM"}
+      </>
+    )
+  }
+
   return (
     <Card className="classDisplay" sx={{ width: 300 }}>
       <CardHeader
@@ -248,15 +285,13 @@ export default function ClassDisplay(props: { classInfo: ClassDisplayInfo }) {
         {props.classInfo.schedules.map((schedule) => 
           <div key={schedule.days + schedule.startTime}>
             <Typography variant="body1" color="text.secondary" key={schedule.days + schedule.startTime}>
-              {schedule.days} {
-              (Math.floor(schedule.startTime / 60) - 1) % 12 + 1}:{(schedule.startTime%60).toString().padStart(2, "0")} {schedule.startTime >= 13*60 ? "PM" : "AM"} - {
-              (Math.floor(schedule.endTime / 60) - 1) % 12 + 1}:{(schedule.endTime%60).toString().padStart(2, "0")} {schedule.endTime >= 13*60 ? "PM" : "AM"}
+              {schedule.days} {stringifyTime(schedule.startTime, schedule.endTime)}
             </Typography>
             <Typography variant="body1" color="text.secondary">{schedule.instructors.map((instructor) => titleCase(instructor.name.split(",").reverse().join(" "))).join(", ")}</Typography>
             
           </div>
         )}
-        <Typography variant="body2" color="text.secondary">{props.classInfo.hours} credit hours</Typography>
+        <Typography variant="body2" color="text.secondary">{props.classInfo.units} credit hours</Typography>
         
       </CardContent>
       <CardActions disableSpacing>
