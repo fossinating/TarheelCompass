@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/server/auth';
 import { userTable } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
-import { Env } from '../route';
 import { db } from '@/server/db';
 
 export const runtime = 'edge';
@@ -11,7 +10,7 @@ export interface ChangeUsernameParams {
     newUsername: string;
 }
  
-export async function POST(req: NextRequest, env: Env) {
+export async function POST(req: NextRequest) {
     const session = await auth()
     if (session && session?.user && session.user?.email) {
         let data: ChangeUsernameParams = await req.json();

@@ -1,9 +1,4 @@
 /* Core */
-import { AddClassParams } from 'src/app/api/user/schedule/add_class/route';
-import { DeleteScheduleParams } from 'src/app/api/user/schedule/delete_schedule/route';
-import { RemoveClassParams } from 'src/app/api/user/schedule/remove_class/route';
-import { RenameScheduleParams } from 'src/app/api/user/schedule/rename_schedule/route';
-import { ChangeUsernameParams } from 'src/app/api/user/username/route';
 import { TermData } from 'src/app/lib/Common';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 import {v4 as uuidv4} from 'uuid';
@@ -44,7 +39,7 @@ export const systemSlice = createSlice({
   initialState: getInitialState(),
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
-    addClass: (state, action: PayloadAction<AddClassParams>) => {
+    addClass: (state, action: PayloadAction<{scheduleID: string, classNumber: number}>) => {
       // Redux Toolkit allows us to write "mutating" logic in reducers. It
       // doesn't actually mutate the state because it uses the Immer library,
       // which detects changes to a "draft state" and produces a brand new
@@ -56,7 +51,7 @@ export const systemSlice = createSlice({
         }
       }
     },
-    removeClass: (state, action: PayloadAction<RemoveClassParams>) => {
+    removeClass: (state, action: PayloadAction<{scheduleID: string, classNumber: number}>) => {
       let schedule = state.schedules.find((schedule) => schedule.id === action.payload.scheduleID);
       if (schedule) {
         schedule.classNumbers = schedule.classNumbers.filter(class_number => class_number != action.payload.classNumber);
@@ -77,10 +72,10 @@ export const systemSlice = createSlice({
         return{ payload: {term: term, name: name, id: id}};
       }
     },
-    deleteSchedule: (state, action: PayloadAction<DeleteScheduleParams>) => {
+    deleteSchedule: (state, action: PayloadAction<{id: string}>) => {
       state.schedules = state.schedules.filter((schedule) => {schedule.id !== action.payload.id});
     },
-    renameSchedule: (state, action: PayloadAction<RenameScheduleParams>) => {
+    renameSchedule: (state, action: PayloadAction<{id: string, newName: string}>) => {
       let schedule = state.schedules.find((schedule) => {schedule.id === action.payload.id});
       if (schedule) {
         schedule.name = action.payload.newName;
