@@ -5,8 +5,11 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { useRef, useState } from "react";
 import { gql } from "../../__generated__";
 import ClassDisplay from "../lib/ClassDisplay";
-import { SectionData, titleCase, useTerms } from "../lib/Common";
+import { SectionData, titleCase } from "../lib/Common";
+import { useTerms } from "../lib/Terms";
 import "./Search.css";
+
+export const runtime = "edge";
 
 export interface SnackbarMessage {
   message: string;

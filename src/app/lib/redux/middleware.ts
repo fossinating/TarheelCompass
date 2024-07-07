@@ -4,6 +4,7 @@ import { getSession } from 'next-auth/react';
 import { createLogger } from 'redux-logger';
 import { ReduxState } from '.';
 import { addClass, changeCurrentSchedule, createSchedule, deleteSchedule, removeClass, renameSchedule } from './slices/systemSlice';
+import { addClassRemote, createScheduleRemote, deleteScheduleRemote, removeClassRemote, renameScheduleRemote } from '@/server/functions/schedules';
 
 /*const SYNC_LOCALSTORAGE: Middleware = (store) => (next) => (action) => {
   const result = next(action);
@@ -72,12 +73,11 @@ listenerMiddleware.startListening({
   effect: async (action, listenerAPI) => {
     const session = await getSession();
     if (session !== null) {
-      fetch(
-        "/api/user/schedule/add_class",
-        {
-          ...requestOptions,
-          body: JSON.stringify(action.payload)
-        })
+      const response = await addClassRemote(action.payload.scheduleID, action.payload.classNumber);
+      if (!response.success) {
+        // TODO: Add error messages that pop up for the user
+        console.error(response.message);
+      }
     }
   }
 })
@@ -87,12 +87,11 @@ listenerMiddleware.startListening({
   effect: async (action, listenerAPI) => {
     const session = await getSession();
     if (session !== null) {
-      fetch(
-        "/api/user/schedule/remove_class",
-        {
-          ...requestOptions,
-          body: JSON.stringify(action.payload)
-        })
+      const response = await removeClassRemote(action.payload.scheduleID, action.payload.classNumber);
+      if (!response.success) {
+        // TODO: Add error messages that pop up for the user
+        console.error(response.message);
+      }
     }
   }
 })
@@ -103,12 +102,11 @@ listenerMiddleware.startListening({
     const session = await getSession();
     console.log(session);
     if (session !== null) {
-      fetch(
-        "/api/user/schedule/create_schedule",
-        {
-          ...requestOptions,
-          body: JSON.stringify(action.payload)
-        })
+      const response = await createScheduleRemote(action.payload.id, action.payload.name, action.payload.term);
+      if (!response.success) {
+        // TODO: Add error messages that pop up for the user
+        console.error(response.message);
+      }
     }
   }
 })
@@ -118,12 +116,11 @@ listenerMiddleware.startListening({
   effect: async (action, listenerAPI) => {
     const session = await getSession();
     if (session !== null) {
-      fetch(
-        "/api/user/schedule/delete_schedule",
-        {
-          ...requestOptions,
-          body: JSON.stringify(action.payload)
-        })
+      const response = await deleteScheduleRemote(action.payload.id);
+      if (!response.success) {
+        // TODO: Add error messages that pop up for the user
+        console.error(response.message);
+      }
     }
   }
 })
@@ -133,12 +130,11 @@ listenerMiddleware.startListening({
   effect: async (action, listenerAPI) => {
     const session = await getSession();
     if (session !== null) {
-      fetch(
-        "/api/user/schedule/rename_schedule",
-        {
-          ...requestOptions,
-          body: JSON.stringify(action.payload)
-        })
+      const response = await renameScheduleRemote(action.payload.id, action.payload.newName);
+      if (!response.success) {
+        // TODO: Add error messages that pop up for the user
+        console.error(response.message);
+      }
     }
   }
 })
