@@ -4,26 +4,26 @@ Mobile-friendly view of the schedule display view
 
 */
 
-.schedule-container {
+.scheduleContainer {
     display: grid;
     grid-template-rows: 1fr 3rem;
     height: 100%;
 }
 
-.schedule-details {
+.scheduleDetails {
     min-height: 3rem;
     overflow: clip;
     background-color: rgb(158, 158, 158);
     border-radius: 5px 5px 0 0;
 }
 
-.schedule-details-topbar {
+.scheduleDetailsTopbar {
     display: grid;
     grid-template-columns: auto 1fr 3rem;
     height: 3rem;
 }
 
-.schedule-name {
+.scheduleName {
     font-size: 1.5em;
     padding: 0 .3rem 0 0.6rem;
     text-align: center;
@@ -31,7 +31,7 @@ Mobile-friendly view of the schedule display view
     text-overflow: ellipsis;
 }
 
-.schedule-semester {
+.scheduleSemester {
     border-left: var(--primary-text-color) solid 2px;
     margin: auto 0;
     padding: 0;
@@ -39,7 +39,7 @@ Mobile-friendly view of the schedule display view
     font-size: 1.2em;
 }
 
-.schedule-name, .schedule-semester {
+.scheduleName, .scheduleSemester {
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -47,7 +47,7 @@ Mobile-friendly view of the schedule display view
     color: var(--primary-text-color);
 }
 
-.details-expand-btn > svg {
+.detailsExpandBtn > svg {
     transform: rotate(180deg);
     transition: transform .5s linear;
 }
@@ -58,11 +58,11 @@ Changes for when the details pane is expanded (still mobile view)
 
 */
 
-.schedule-container.expanded-details {
+.scheduleContainer.expandedDetails {
     grid-template-rows: 1fr auto;
 }
 
-.schedule-container.expanded-details .details-expand-btn > svg{
+.scheduleContainer.expandedDetails .detailsExpandBtn > svg{
     transform: rotate(360deg);
 }
 
@@ -73,7 +73,7 @@ Display configuration for the schedule itself
 
 */
 
-.schedule-box {
+.scheduleBox {
     display: flex;
     flex-direction: column;
     overflow: scroll;
@@ -88,26 +88,26 @@ Display configuration for the schedule itself
     padding: 0 8px;
 
     --numHours: 14;
-    --timeHeight: 5rem;
+    --timeHeight: 7rem;
 }
 
-.schedule.one-day {
+.schedule.oneDay {
     --numDays: 1;
 }
 
-.schedule.three-day {
+.schedule.threeDay {
     --numDays: 3;
 }
 
-.schedule.five-day {
+.schedule.fiveDay {
     --numDays: 5;
 }
 
-.schedule.seven-day {
+.schedule.sevenDay {
     --numDays: 7
 }
 
-.hour-labels {
+.hourLabels {
 display: grid;
 grid-template-rows: 3rem repeat(var(--numHours), var(--timeHeight));
 }
@@ -127,7 +127,7 @@ grid-template-columns: repeat(var(--numDays), 1fr);
     background: grey;
 }
 
-.class-card {
+.classCard {
   margin: 0 0.5rem;
 }
 

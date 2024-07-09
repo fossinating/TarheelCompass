@@ -5,7 +5,7 @@ import * as React from 'react';
 import { gql } from "src/__generated__";
 import { readableTime, titleCase } from "../Common";
 import { Schedule } from '../redux';
-import "./ScheduleDisplay.css";
+import styles from "./ScheduleDisplay.module.css";
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
 
 /*
@@ -21,7 +21,7 @@ function ClassCard(props: {classData: {course: {code: string}, classSection: str
     return null;
   }
   return (
-    <Card className="class-card" style={{gridRow: ((props.schedule.startTime - 480) / 5).toString() + "/" + ((props.schedule.endTime - 480) / 5).toString(), backgroundColor: "hsl(" + Math.round(360*(props.classIndex/(props.classCount))) + " 80% 80%)"}}>
+    <Card className={styles.classCard} style={{gridRow: ((props.schedule.startTime - 480) / 5).toString() + "/" + ((props.schedule.endTime - 480) / 5).toString(), backgroundColor: "hsl(" + Math.round(360*(props.classIndex/(props.classCount))) + " 80% 80%)"}}>
       <CardActionArea onClick={props.setSelectedClass !== undefined ? () => (props.setSelectedClass as (index: number) => void)(props.classIndex) : undefined}>
         <CardContent style={{padding: "4px"}}>
           <Typography variant="h6" component="div">
@@ -104,7 +104,7 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
   const [expandedDetails, setExpandedDetails] = React.useState<boolean>(false);
 
   const [earliestDay, setEarliestDay] = React.useState<number>(1);
-  const [daysShown, setDaysShown] = React.useState<number>(1);
+  const [daysShown, setDaysShown] = React.useState<number>(5);
 
   // Swipe code ! (stolen from https://stackoverflow.com/questions/70612769/how-do-i-recognize-swipe-events-in-react)
 
@@ -200,23 +200,23 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
     return (<CircularProgress />)
   } else {
     return (
-      <div className={"schedule-container" + (expandedDetails ? " expanded-details" : "")}>
-        <div className="schedule-box">
-          <div className={"schedule " + (daysShown == 1 ? "one-day" : daysShown == 3 ? "three-day" : daysShown == 5 ? "five-day" : "seven-day")}
+      <div className={styles.scheduleContainer + (expandedDetails ? " " + styles.expandedDetails : "")}>
+        <div className={styles.scheduleBox}>
+          <div className={styles.schedule + " " + (daysShown == 1 ? styles.oneDay : daysShown == 3 ? styles.threeDay : daysShown == 5 ? styles.fiveDay : styles.sevenDay)}
              onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
-            <div className="hour-labels">
-              <div className="spacer" />
+            <div className={styles.hourLabels}>
+              <div className={styles.spacer} />
               {
                 [...Array(14).keys()].map((hour) => 
-                    <div key={hour} className="hour-label">{ ((hour + 8 - 1) % 12 + 1).toString() + ((hour + 8) > 11 ? " PM" : " AM") }</div>
+                    <div key={hour} className={styles.hourLabel}>{ ((hour + 8 - 1) % 12 + 1).toString() + ((hour + 8) > 11 ? " PM" : " AM") }</div>
                 )
               }
             </div>
-            <div className="days">
+            <div className={styles.days}>
               { [...Array(daysShown).keys()].map((dayIndex) => 
-                <div className={"day " + dayStrings[earliestDay+dayIndex]} key={dayIndex}>
-                  <div className="date">{dayStrings[earliestDay+dayIndex]}</div>
-                  <div className="classes">{dayClasses[earliestDay+dayIndex]}</div>
+                <div className={styles.day + " " + dayStrings[earliestDay+dayIndex]} key={dayIndex}>
+                  <div className={styles.date}>{dayStrings[earliestDay+dayIndex]}</div>
+                  <div className={styles.classes}>{dayClasses[earliestDay+dayIndex]}</div>
                 </div>
               )}
             </div>
@@ -224,11 +224,11 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
       </div>
       {
         props.showSidebar ?
-        <div className="schedule-details">
-          <div className="schedule-details-topbar">
-            <span className="schedule-name">{props.scheduleData.name}</span>
-            <span className="schedule-semester">{props.scheduleData.term}</span>
-            <IconButton className="details-expand-btn" onClick={expandDetailsClick}>
+        <div className={styles.scheduleDetails}>
+          <div className={styles.scheduleDetailsTopbar}>
+            <span className={styles.scheduleName}>{props.scheduleData.name}</span>
+            <span className={styles.scheduleSemester}>{props.scheduleData.term}</span>
+            <IconButton className={styles.detailsExpandBtn} onClick={expandDetailsClick}>
               <ExpandCircleDownIcon />
             </IconButton>
           </div>
