@@ -6,6 +6,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import * as React from 'react';
 import { reloadSession } from '../util';
+import { changeUsername } from '@/server/functions/user';
 
 
 export default function OnboardingDialog() {
@@ -20,31 +21,24 @@ export default function OnboardingDialog() {
       setOpen(false);
     };
 
-    const submit = () => {
+    const submit = async () => {
       if (usernameInput.length > 2 && usernameInput.length <= 20 && usernameInput.match("^[a-z0-9][a-z0-9\_.\-]+[a-z0-9]$") !== null) {
         setErrMessage(null);
         setLoading(true);
-        const requestOptions = {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: usernameInput })
-        };
-        fetch('/api/user/username', requestOptions)
-            .then(async response => {
-              if (response.ok) {
-                //props.setUsername(usernameInput);
-                setOpen(false);
-                reloadSession();
-              } else {
-                setLoading(false);
-                try {
-                  let data = await response.json() as {errMessage: string};
-                  setErrMessage(data?.errMessage ? data.errMessage : "An unknown error occured, if this continues please contact support.");
-                } catch {
-                  setErrMessage("An unknown error occured, if this continues please contact support.");
-                }
-              }
-            }) 
+        try {
+          let newUsername = await changeUsername(usernameInput);
+          if (newUsername) {
+            setOpen(false);
+            reloadSession();
+          }
+        } catch (e) {
+          if (e instanceof Error) {
+            setErrMessage(e.message);
+          } else if (typeof e === "string") {
+            setErrMessage(e);
+            //setErrMessage("An unknown error occured, if this continues please contact support.");
+          }
+        }
       } else {
         setErrMessage("Invalid username. Username must be 3-20 characters, characters a-Z, 0-9, `.`, `-`, or `_`, and must start and end with a-Z or 0-9.")
       }
