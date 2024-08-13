@@ -10,7 +10,7 @@ Mobile-friendly view of the schedule display view
     height: 100%;
 }
 
-.scheduleDetails {
+.scheduleDetailsBox {
     min-height: 3rem;
     overflow: clip;
     background-color: rgb(158, 158, 158);
