@@ -5,6 +5,13 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
 
+// note: the if statement is present because you
+//       only need to use the function during development
+if (process.env.NODE_ENV === "development") {
+  const { setupDevPlatform } = require("@cloudflare/next-on-pages/next-dev")
+  setupDevPlatform()
+}
+
 
 const nextConfig = {
   webpack: (config, { isServer, webpack, nextRuntime }) => {
@@ -70,11 +77,10 @@ const nextConfig = {
   images: {
     domains: ['avatars.githubusercontent.com', 'avatar.vercel.sh']
   },
-  experimental: {
-    serverActions: true,
-    serverComponentsExternalPackages: ['@tremor/react']
-  },
   reactStrictMode: true,
+  experimental: {
+    instrumentationHook: true,
+  },
 };
 //console.log('Custom Webpack Configuration Applied:', nextConfig);
 
