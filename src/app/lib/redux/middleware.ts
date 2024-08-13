@@ -58,11 +58,11 @@ listenerMiddleware.startListening({
 })
 
 const requestOptions = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  };
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+};
 
 /*
       Middleware for logged in users, sending mutations to the server
@@ -73,10 +73,10 @@ listenerMiddleware.startListening({
   effect: async (action, listenerAPI) => {
     const session = await getSession();
     if (session !== null) {
-      const response = await addClassRemote(action.payload.scheduleID, action.payload.classNumber);
-      if (!response.success) {
-        // TODO: Add error messages that pop up for the user
-        console.error(response.message);
+      try {
+        const response = await addClassRemote(action.payload.scheduleID, action.payload.classNumber);
+      } catch (error: any) {
+        console.error("An error occured while adding class to schedule: " + error);
       }
     }
   }
@@ -87,10 +87,10 @@ listenerMiddleware.startListening({
   effect: async (action, listenerAPI) => {
     const session = await getSession();
     if (session !== null) {
-      const response = await removeClassRemote(action.payload.scheduleID, action.payload.classNumber);
-      if (!response.success) {
-        // TODO: Add error messages that pop up for the user
-        console.error(response.message);
+      try {
+        const response = await removeClassRemote(action.payload.scheduleID, action.payload.classNumber);
+      } catch (error: any) {
+        console.error("An error occured while removing class from schedule: " + error);
       }
     }
   }
@@ -102,10 +102,10 @@ listenerMiddleware.startListening({
     const session = await getSession();
     console.log(session);
     if (session !== null) {
-      const response = await createScheduleRemote(action.payload.id, action.payload.name, action.payload.term);
-      if (!response.success) {
-        // TODO: Add error messages that pop up for the user
-        console.error(response.message);
+      try {
+        const response = await createScheduleRemote(action.payload.id, action.payload.name, action.payload.term);
+      } catch (error: any) {
+        console.error("An error occured while creating schedule: " + error);
       }
     }
   }
@@ -116,10 +116,10 @@ listenerMiddleware.startListening({
   effect: async (action, listenerAPI) => {
     const session = await getSession();
     if (session !== null) {
-      const response = await deleteScheduleRemote(action.payload.id);
-      if (!response.success) {
-        // TODO: Add error messages that pop up for the user
-        console.error(response.message);
+      try {
+        const response = await deleteScheduleRemote(action.payload.id);
+      } catch (error: any) {
+        console.error("An error occured while deleting schedule: " + error);
       }
     }
   }
@@ -130,10 +130,10 @@ listenerMiddleware.startListening({
   effect: async (action, listenerAPI) => {
     const session = await getSession();
     if (session !== null) {
-      const response = await renameScheduleRemote(action.payload.id, action.payload.newName);
-      if (!response.success) {
-        // TODO: Add error messages that pop up for the user
-        console.error(response.message);
+      try {
+        const response = await renameScheduleRemote(action.payload.id, action.payload.newName);
+      } catch (error: any) {
+        console.error("An error occured while renaming schedule: " + error);
       }
     }
   }
