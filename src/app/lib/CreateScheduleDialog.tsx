@@ -6,7 +6,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
-import { useTerms } from './Common';
+import { useTerms } from './Terms';
 import { createSchedule } from './redux';
 
 
