@@ -3,11 +3,6 @@ compatibility_flags = ["nodejs_compat"]
 compatibility_date = "2024-07-03"
 pages_build_output_dir = ".vercel/output/static"
 
-[[d1_databases]]
-binding = "DB" # i.e. available in your Worker on env.DB
-database_name = "db-tarheel-compass"
-database_id = "786d9e50-3cd0-4401-8cd2-7ba56a734a74"
-
 [env.production.vars]
 NEXTAUTH_URL="https://tarheelcompass.com"
 PUBLIC_URL="https://tarheelcompass.com"
@@ -24,3 +19,9 @@ name = "preview"
 binding = "DB" # i.e. available in your Worker on env.DB
 database_name = "preview-db-tarheel-compass"
 database_id = "8e064496-ce2f-48d2-81fb-e1fb5346b92d"
+
+[env.production]
+[[env.production.d1_databases]]
+binding = "DB" # i.e. available in your Worker on env.DB
+database_name = "prod-db-tarheel-compass"
+database_id = "786d9e50-3cd0-4401-8cd2-7ba56a734a74"
