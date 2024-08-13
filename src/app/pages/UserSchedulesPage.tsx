@@ -2,10 +2,36 @@
 import { selectCurrentScheduleIndex, selectSchedules } from 'src/app/lib/redux';
 import ScheduleDisplay from 'src/app/lib/ScheduleDisplay/ScheduleDisplay';
 import { Button, CircularProgress } from '@mui/material';
-import { useSession } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import * as React from 'react';
 import { useSelector } from 'react-redux';
-import "./UserSchedules.css";
+import styles from "./UserSchedules.module.css";
+import { useState } from 'react';
+import CreateScheduleDialog from '../lib/CreateScheduleDialog';
+
+function NoSchedulesPage() {
+  const session = useSession();
+  const [createScheduleVisible, setCreateScheduleVisible] = useState(false);
+
+  const showCreateSchedule = () => {
+    setCreateScheduleVisible(true);
+  }
+
+  const createScheduleClosed = () => {
+    // It automatically paths to the new schedule, so we don't need to do anything here
+  }
+
+  return (
+    <div className={styles.no_schedules_prompt}>
+      <div className={styles.box_title}>No Schedules Found</div>
+      <div className={styles.box_content}>
+        <Button onClick={showCreateSchedule}>Make your first schedule</Button>
+        { session.status == "unauthenticated" ? <Button onClick={() => signIn()}>Log in to view saved schedules</Button> : null }
+      </div>
+      <CreateScheduleDialog open={createScheduleVisible} onClose={createScheduleClosed} />
+    </div>
+  )
+}
 
 export default function UserSchedulesPage() {
   const schedules = useSelector(selectSchedules);
@@ -15,21 +41,13 @@ export default function UserSchedulesPage() {
 
   if (schedules === undefined) {
      return <CircularProgress/>
+  } else if (schedules.length == 0) {
+    return <NoSchedulesPage/>
   } else if (schedules[currentScheduleIndex] == undefined) {
     return "schedules[currentScheduleIndex] is undefined, report this";
-  } else if (schedules.length == 0) {
-    return (
-      <div id="no-schedules-prompt">
-        <div className="box-title">No Schedules Found</div>
-        <div className="box-content">
-          <Button>Make your first schedule</Button>
-          { session.status == "unauthenticated" ? <Button>Log in to view saved schedules</Button> : null }
-        </div>
-      </div>
-    )
   } else {
     return (
-      <ScheduleDisplay scheduleData={schedules[currentScheduleIndex]} />
+      <ScheduleDisplay scheduleData={schedules[currentScheduleIndex]} showSidebar={true} editable={true}/>
     );
   }
 }
