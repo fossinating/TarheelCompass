@@ -10,20 +10,20 @@ Mobile-friendly view of the schedule display view
     height: 100%;
 }
 
-.scheduleDetailsBox {
+.detailsBox {
     min-height: 3rem;
     overflow: clip;
-    background-color: rgb(158, 158, 158);
+    background-color: var(--height-1-background);
     border-radius: 5px 5px 0 0;
 }
 
-.scheduleDetailsTopbar {
+.detailsTopbar {
     display: grid;
     grid-template-columns: auto 1fr 3rem;
     height: 3rem;
 }
 
-.scheduleName {
+.detailName {
     font-size: 1.5em;
     padding: 0 .3rem 0 0.6rem;
     text-align: center;
@@ -31,15 +31,14 @@ Mobile-friendly view of the schedule display view
     text-overflow: ellipsis;
 }
 
-.scheduleSemester {
+.detailSubtitle {
     border-left: var(--primary-text-color) solid 2px;
-    margin: auto 0;
     padding: 0;
     padding-left: 0.3rem;
     font-size: 1.2em;
 }
 
-.scheduleName, .scheduleSemester {
+.detailName, .detailSubtitle {
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -47,10 +46,139 @@ Mobile-friendly view of the schedule display view
     color: var(--primary-text-color);
 }
 
+.detailsExpandBtn {
+    grid-column: 3/4;
+    margin-left: auto !important;
+}
+
 .detailsExpandBtn > svg {
     transform: rotate(180deg);
     transition: transform .5s linear;
 }
+
+.scheduleDetails {
+    padding: .5em;
+}
+
+.scheduleClassListBox {
+    background-color: var(--height-2-background);
+    margin-top: 1em;
+    padding: .5em;
+    border-radius: .7em;
+}
+
+.scheduleClassListTitle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 1.4em;
+}
+
+.scheduleClassList {
+    display: flex;
+    flex-direction: column;
+}
+
+.scheduleClassListing {
+    margin: .1em 0;
+    padding: .3em .5em;
+    background-color: var(--height-3-background);
+    border-radius: .3em;
+    
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    cursor: pointer;
+}
+
+.scheduleClassListing > .deleteClassButton {
+    margin-left: auto !important;
+}
+
+.classDetails {
+    padding: .5em;
+    display: flex;
+    flex-direction: column;
+}
+
+.classTitle {
+    font-size: 1.3em;
+}
+
+.classSchedulesTitle {
+    font-size: 1.3em;
+    margin-top: .4em;
+}
+
+.classSchedules {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+}
+
+.classSchedule {
+    background-color: var(--height-2-background);
+    width: fit-content;
+    padding: .5em;
+    border-radius: .5em;
+}
+
+.classDetailsRemove {
+    align-self: center;
+    margin-top: .3em !important;
+}
+
+.classStatsTitle {
+    font-size: 1.15em;
+}
+
+.expandClickArea {
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.expandIcon {
+    display: grid;
+}
+
+.expandIcon > svg {
+    grid-column: 1/2;
+    grid-row: 1/2;
+    transform: rotate(0deg);
+    transition: transform .3s;
+}
+
+.classStatsBox:not(.classStatsExpanded) .expandIcon > svg:first-child {
+    transform: rotate(90deg);
+}
+
+.classStatsBox {
+    background-color: var(--height-2-background);
+    margin-top: .3em;
+    border-radius: .5em;
+}
+
+.classStats {
+    max-height: 0;
+    overflow-y: clip;
+    transition: max-height .5s;
+    padding: 0 .5em;
+}
+
+.statData:last-child {
+    margin-bottom: .5em;
+}
+.statData:first-child {
+    padding-top: .5em;
+}
+
+.classStatsBox.classStatsExpanded .classStats {
+    max-height: 40vh;
+}
+
 
 /* 
 

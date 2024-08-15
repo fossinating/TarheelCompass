@@ -1,14 +1,16 @@
 "use client"
 import { useLazyQuery } from "@apollo/client";
-import { Card, CardActionArea, CardContent, CircularProgress, IconButton, Typography } from "@mui/material";
+import { Button, Card, CardActionArea, CardContent, CircularProgress, IconButton, Typography } from "@mui/material";
 import * as React from 'react';
 import { gql } from "src/__generated__";
-import { readableTime, titleCase } from "../Common";
+import { readableTime, stringifyTime, titleCase } from "../Common";
 import styles from "./ScheduleDisplay.module.css";
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useDispatch } from 'react-redux';
 import { removeClass, Schedule } from '../redux';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import RemoveIcon from '@mui/icons-material/Remove';
 
 /*
   Class Card
@@ -83,6 +85,9 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
       description
     },
     classSection,
+    component,
+    meetingDates,
+    instructionType,
     title,
     schedules {
       building,
@@ -96,6 +101,8 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
     },
     enrollmentTotal,
     enrollmentCap,
+    waitlistTotal,
+    waitlistCap,
     units,
     lastUpdatedAt
   }
@@ -159,6 +166,15 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
   const dispatch = useDispatch();
 
 
+  // Pop out panel when class clicked
+
+  React.useEffect(() => {
+    if (selectedClass != -1) {
+      setExpandedDetails(true);
+    }
+  }, [selectedClass])
+
+
   // Effect for when data returns from the graphql query
   React.useEffect(() => {
     const dayIndices = ["Su", "M", "Tu", "W", "Th", "F", "Sa"]
@@ -218,6 +234,80 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
     setCredits(minCredits != maxCredits ? (minCredits + " - " + maxCredits) : (minCredits + (creditsUncertain ? "+" : "")));
   }, [data, props.showSidebar])
 
+  type FullClassDetails = { __typename?: 'Class', classNumber: number, classSection: string, component?: string | null, meetingDates?: string | null, instructionType: string, title: string, enrollmentTotal: number, enrollmentCap?: number | null, waitlistTotal?: number | null, waitlistCap?: number | null, units: string, lastUpdatedAt: any, course: { __typename?: 'Course', code: string, description?: string | null }, schedules: Array<{ __typename?: 'ClassSchedule', building?: string | null, room?: string | null, days: string, startTime?: number | null, endTime?: number | null, instructors: Array<{ __typename?: 'Instructor', name: string }> }> }
+  
+
+  const ClassDetails = (props: {scheduleData: Schedule, selectedClass: number, editable: boolean|unknown}) => {
+    // We only get class details when a sidebar is visible, meaning the full class details were requested
+    const classData: FullClassDetails | undefined = data?.classes[props.selectedClass] as FullClassDetails | undefined;
+
+    const [classStatsExpanded, setClassStatsExpanded] = React.useState(false);
+
+    if (classData === undefined) {
+      return ("Invalid class")
+    }
+
+    return (
+      <div className={styles.classDetails}>
+        <div className={styles.classInfoBox}>
+          <div className={styles.classTitle}>{classData.title}</div>
+          <div className={styles.classDescription}>{classData.course.description}</div>
+        </div>
+        <div className={styles.classSchedulesBox}>
+          <div className={styles.classSchedulesTitle}>Schedule:</div>
+          <div className={styles.classSchedules}>
+            {classData.schedules.map((schedule: {building?: string|null, room?: string | null; days: string; startTime?: number | null; endTime?: number | null; instructors: Array<{name: string; }>}) => {
+              return <div key={schedule.days + schedule.startTime + schedule.endTime} className={styles.classSchedule}>
+                <span>{schedule.days} {stringifyTime(schedule.startTime, schedule.endTime)}</span><br />
+                <span>{schedule.building} {schedule.room}</span><br />
+                <span>{schedule.instructors.map((instructor) => titleCase(instructor.name.split(",").reverse().join(" "))).join(", ")}</span>
+              </div>
+            })}
+          </div>
+        </div> 
+
+        <div className={styles.classStatsBox + " " + (classStatsExpanded ? styles.classStatsExpanded : "")}>
+          <div className={styles.expandClickArea} onClick={() => setClassStatsExpanded(!classStatsExpanded)}>
+            <div className={styles.expandIcon}>
+              <RemoveIcon />
+              <RemoveIcon />
+            </div>
+            <div className={styles.classStatsTitle}>Details</div>
+          </div>
+          <div className={styles.classStats}>
+            <span className={styles.statName}>Credits: </span>
+            <span className={styles.statData}>{classData.units}</span>
+            <br />
+            <span className={styles.statName}>Enrollment: </span>
+            <span className={styles.statData}>{classData.enrollmentTotal} / {classData.enrollmentCap}</span>
+            <br />
+            <span className={styles.statName}>Waitlist: </span>
+            <span className={styles.statData}>{classData.waitlistTotal} / {classData.waitlistCap}</span>
+            <br />
+            <span className={styles.statName}>Meeting Dates: </span>
+            <span className={styles.statData}>{classData.meetingDates}</span>
+            <br />
+            <span className={styles.statName}>Instruction Type: </span>
+            <span className={styles.statData}>{classData.instructionType}</span>
+            <br />
+            <span className={styles.statName}>Class Component: </span>
+            <span className={styles.statData}>{classData.component}</span>
+            <br />
+            <span className={styles.statName}>Class Number: </span>
+            <span className={styles.statData}>{classData.classNumber}</span>
+            <br />
+            <span className={styles.statName}>Last Updated at: </span>
+            <span className={styles.statData}>{classData.lastUpdatedAt}</span>
+          </div>
+        </div>
+        { props.editable ? 
+        <Button className={styles.classDetailsRemove} variant="outlined" onClick={() => dispatch(removeClass({classNumber: classData.classNumber, scheduleID: props.scheduleData.id}))} startIcon={<DeleteIcon />}>Remove</Button>
+        : null }
+      </div>
+    )
+  }
+
+
   if (props.scheduleData === undefined) {
     return (<h1>Invalid Schedule!</h1>)
   } else if (loading) {
@@ -248,10 +338,18 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
         </div>
         {
           props.showSidebar ?
-            <div className={styles.scheduleDetailsBox}>
-              <div className={styles.scheduleDetailsTopbar}>
-                <span className={styles.scheduleName}>{props.scheduleData.name}</span>
-                <span className={styles.scheduleSemester}>{props.scheduleData.term}</span>
+            <div className={styles.detailsBox}>
+              <div className={styles.detailsTopbar}>
+                { selectedClass != -1 ?
+                <IconButton className={styles.backBtn} onClick={() => setSelectedClass(-1)}>
+                  <ArrowBackIcon />
+                </IconButton>
+                : null}
+                <span className={styles.detailName}>{selectedClass == -1 ? props.scheduleData.name : (data?.classes[selectedClass]?.course.code + " - " + data?.classes[selectedClass]?.classSection)}</span>
+                { selectedClass == -1 && !expandedDetails ? 
+                  <span className={styles.detailSubtitle}>{props.scheduleData.term}</span> : null
+                }
+                
                 <IconButton className={styles.detailsExpandBtn} onClick={expandDetailsClick}>
                   <ExpandCircleDownIcon />
                 </IconButton>
@@ -259,13 +357,17 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
               {selectedClass == -1 ?
                 <div className={styles.scheduleDetails}>
                   <div className={styles.scheduleStats}>
+                    <span className={styles.statName}>Semester: </span>
+                    <span className={styles.statData}>{props.scheduleData.term}</span>
+                    <br />
                     <span className={styles.statName}>Credits: </span>
                     <span className={styles.statData}>{credits}</span>
                   </div>
                   <div className={styles.scheduleClassListBox}>
                     <div className={styles.scheduleClassListTitle}>Classes:</div>
                     <div className={styles.scheduleClassList}>
-                      {data?.classes && data.classes.length > 0 ? data?.classes.map((classData) => <div key={classData.classNumber} className={styles.scheduleClassListing}>
+                      {data?.classes && data.classes.length > 0 ? 
+                        data?.classes.map((classData, index) => <div key={classData.classNumber} className={styles.scheduleClassListing} onClick={() => setSelectedClass(index)}>
                         <div className={styles.scheduleClassName}>{classData.course.code} - {classData.classSection}</div>
                         <IconButton className={styles.deleteClassButton} onClick={() => dispatch(removeClass({classNumber: classData.classNumber, scheduleID: props.scheduleData.id}))}>
                           <DeleteIcon />
@@ -274,12 +376,8 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
                     </div>
                   </div>
                 </div> :
-                <div className={styles.classDetails}>
-
-
-                </div>
+                <ClassDetails scheduleData={props.scheduleData} selectedClass={selectedClass} editable={props.editable} />
               }
-
             </div>
             : null
         }
