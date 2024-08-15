@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { gql } from 'src/__generated__';
 import CreateScheduleDialog from './CreateScheduleDialog';
-import { titleCase } from './Common';
+import { stringifyTime, titleCase } from './Common';
 import { addClass, removeClass, Schedule, selectCurrentScheduleIndex, selectSchedules } from './redux';
 
 interface ExpandMoreProps extends IconButtonProps {
@@ -249,18 +249,6 @@ export default function ClassDisplay(props: { classInfo: ClassDisplayInfo }) {
 
   const handleCloseCreateScheduleDialog = () => {
     setCreateScheduleOpen(false);
-  }
-
-  const stringifyTime = (startTime?: number | null | undefined, endTime?: number | null | undefined) => {
-    if (!!!startTime || !!!endTime) {
-      return "TBA";
-    }
-    return (
-      <>
-        {(Math.floor(startTime / 60) - 1) % 12 + 1}:{(startTime%60).toString().padStart(2, "0")} {startTime >= 13*60 ? "PM" : "AM"} - 
-        {(Math.floor(endTime / 60) - 1) % 12 + 1}:{(endTime%60).toString().padStart(2, "0")} {endTime >= 13*60 ? "PM" : "AM"}
-      </>
-    )
   }
 
   return (
