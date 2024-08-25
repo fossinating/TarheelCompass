@@ -12,37 +12,35 @@ import PersonIcon from '@mui/icons-material/Person';
 import AddIcon from '@mui/icons-material/Add';
 import Typography from '@mui/material/Typography';
 import { blue } from '@mui/material/colors';
-import { Schedule, selectSchedules, useSelector } from './redux';
+import { changeCurrentSchedule, Schedule, selectSchedules, useDispatch, useSelector } from './redux';
+import { useState } from 'react';
 
 export interface ScheduleSelectorDialogProps {
   open: boolean;
   onClose: () => void;
 }
 
-export default function ScheduleSelectorDialog(props: ScheduleSelectorDialogProps) {
+function ScheduleSelectorDialog(props: ScheduleSelectorDialogProps) {
   const { onClose, open } = props;
   const schedules = useSelector(selectSchedules);
+  const dispatch = useDispatch();
 
   const handleClose = () => {
     onClose();
   };
 
-  const handleListItemClick = (value: Schedule) => {
+  const handleListItemClick = (scheduleIndex: number) => {
+    dispatch(changeCurrentSchedule(scheduleIndex))
     onClose();
   };
 
   return (
     <Dialog onClose={handleClose} open={open}>
-      <DialogTitle>Set backup account</DialogTitle>
+      <DialogTitle>Select Schedule</DialogTitle>
       <List sx={{ pt: 0 }}>
-        {schedules.map((schedule) => (
+        {schedules.map((schedule, index) => (
           <ListItem disableGutters key={schedule.id}>
-            <ListItemButton onClick={() => handleListItemClick(schedule)}>
-              <ListItemAvatar>
-                <Avatar sx={{ bgcolor: blue[100], color: blue[600] }}>
-                  <PersonIcon />
-                </Avatar>
-              </ListItemAvatar>
+            <ListItemButton onClick={() => handleListItemClick(index)}>
               <ListItemText primary={schedule.name} />
             </ListItemButton>
           </ListItem>
@@ -63,4 +61,19 @@ export default function ScheduleSelectorDialog(props: ScheduleSelectorDialogProp
       </List>
     </Dialog>
   );
+}
+
+export default function ScheduleSelectorButton() {
+  const [scheduleSelectorVisible, setScheduleSelectorVisible] = useState(false);
+
+  const onClose = () => {
+    setScheduleSelectorVisible(false);
+  }
+
+  return (
+    <>
+      <Button variant={"outlined"} onClick={() => setScheduleSelectorVisible(true)}>Change Term</Button>
+      <ScheduleSelectorDialog onClose={onClose} open={scheduleSelectorVisible}/>
+    </>
+  )
 }
