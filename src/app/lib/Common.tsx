@@ -72,3 +72,15 @@ export function titleCase(str: string) {
 export function readableTime(time: number) {
   return ((Math.floor(time / 60) - 1) % 12 + 1).toString() + ":" + (time%60).toString().padStart(2, "0") + (time >= 13*60 ? "PM" : "AM")
 }
+
+export const stringifyTime = (startTime?: number | null | undefined, endTime?: number | null | undefined) => {
+  if (!!!startTime || !!!endTime) {
+    return "TBA";
+  }
+  return (
+    <>
+      {(Math.floor(startTime / 60) - 1) % 12 + 1}:{(startTime%60).toString().padStart(2, "0")} {startTime >= 13*60 ? "PM" : "AM"}{" - "}
+      {(Math.floor(endTime / 60) - 1) % 12 + 1}:{(endTime%60).toString().padStart(2, "0")} {endTime >= 13*60 ? "PM" : "AM"}
+    </>
+  )
+}
