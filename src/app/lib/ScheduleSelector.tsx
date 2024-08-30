@@ -72,7 +72,7 @@ export default function ScheduleSelectorButton() {
 
   return (
     <>
-      <Button variant={"outlined"} onClick={() => setScheduleSelectorVisible(true)}>Change Term</Button>
+      <Button variant={"outlined"} onClick={() => setScheduleSelectorVisible(true)}>Change Schedule</Button>
       <ScheduleSelectorDialog onClose={onClose} open={scheduleSelectorVisible}/>
     </>
   )
