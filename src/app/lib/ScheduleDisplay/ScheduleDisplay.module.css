@@ -194,6 +194,14 @@ Changes for when the details pane is expanded (still mobile view)
     transform: rotate(360deg);
 }
 
+.scheduleContainer.expandedDetails .detailsTopbar {
+    grid-template-columns: auto .5em 4em 1fr 3rem;
+}
+
+.scheduleContainer.expandedDetails .scheduleSelectorButton {
+    grid-column: 3 / 4;
+}
+
 
 /*
 

@@ -349,7 +349,7 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
                 <span className={styles.detailName}>{selectedClass == -1 ? props.scheduleData.name : (data?.classes[selectedClass]?.course.code + " - " + data?.classes[selectedClass]?.classSection)}</span>
                 { selectedClass == -1 ? 
                   !expandedDetails ? 
-                    <span className={styles.detailSubtitle}>{props.scheduleData.term}</span> : <ScheduleSelectorButton /> 
+                    <span className={styles.detailSubtitle}>{props.scheduleData.term}</span> : <ScheduleSelectorButton className={styles.scheduleSelectorButton} /> 
                   : null
                 }
                 

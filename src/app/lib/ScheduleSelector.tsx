@@ -63,7 +63,7 @@ function ScheduleSelectorDialog(props: ScheduleSelectorDialogProps) {
   );
 }
 
-export default function ScheduleSelectorButton() {
+export default function ScheduleSelectorButton(props: {className?: string}) {
   const [scheduleSelectorVisible, setScheduleSelectorVisible] = useState(false);
 
   const onClose = () => {
@@ -71,7 +71,7 @@ export default function ScheduleSelectorButton() {
   }
 
   return (
-    <>
+    <className={props.className}>
       <Button variant={"outlined"} onClick={() => setScheduleSelectorVisible(true)}>Change Schedule</Button>
       <ScheduleSelectorDialog onClose={onClose} open={scheduleSelectorVisible}/>
     </>
