@@ -11,6 +11,7 @@ import { useDispatch } from 'react-redux';
 import { removeClass, Schedule } from '../redux';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import RemoveIcon from '@mui/icons-material/Remove';
+import ScheduleSelectorButton from "../ScheduleSelector";
 
 /*
   Class Card
@@ -346,8 +347,10 @@ query GetFullScheduleDisplayClasses($class_numbers: [Int!]!, $term: String!) {
                 </IconButton>
                 : null}
                 <span className={styles.detailName}>{selectedClass == -1 ? props.scheduleData.name : (data?.classes[selectedClass]?.course.code + " - " + data?.classes[selectedClass]?.classSection)}</span>
-                { selectedClass == -1 && !expandedDetails ? 
-                  <span className={styles.detailSubtitle}>{props.scheduleData.term}</span> : null
+                { selectedClass == -1 ? 
+                  !expandedDetails ? 
+                    <span className={styles.detailSubtitle}>{props.scheduleData.term}</span> : <ScheduleSelectorButton /> 
+                  : null
                 }
                 
                 <IconButton className={styles.detailsExpandBtn} onClick={expandDetailsClick}>
