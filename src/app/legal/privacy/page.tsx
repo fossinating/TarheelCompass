@@ -44,7 +44,8 @@ export default function Page() {
                 <br/>
                 <b>Search Data</b>: Data about what searches are being completed, including all parameters in each search.
                 <br/>
-                <b>Schedule Interaction</b>: Activity regarding schedules, including the creation and deletion of schedules, along with the classes added and removed.
+                <b>Schedule Interaction</b>: Activity regarding schedules, including the creation, deletion, and renaming of schedules, along with the classes added and removed.
+                To preserve anonymity, the scheduleID is not shared for these events.
 
                 <br/>
                 <br/>
