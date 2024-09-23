@@ -18,6 +18,12 @@ import { usePathname } from 'next/navigation';
 import * as React from 'react';
 import AccountMenu from './lib/AccountMenu';
 import Link from "./lib/Link";
+import { initGA } from './lib/ga-utils';
+import { useLocalStorage } from './localstorage';
+import { useSession } from 'next-auth/react';
+import WelcomeDialog from './lib/WelcomeDialog';
+import MigrationDialog from './lib/MigrationDialog';
+import OnboardingDialog from './lib/OnboardingDialog';
 
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -106,10 +112,27 @@ export default function App({
     children: React.ReactNode
   }) {
     const [open, setOpen] = React.useState(false);
+    const session = useSession();
   
     const handleDrawerToggle = () => {
       setOpen(!open);
     };
+
+    
+    const handleAcceptCookie = () => {
+      if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) {
+        initGA(process.env.REACT_APP_GOOGLE_ANALYTICS_ID);
+      }
+    };
+    const [terms, _setTerms] = useLocalStorage("terms", false);
+    const [analyticsCookieAccepted, _setAnalyticsCookieAccepted] = useLocalStorage("analytics", false);
+    const [localSchedules, _setLocalSchedules] = useLocalStorage("local_schedules", null);
+
+    React.useEffect(() => {
+      if (analyticsCookieAccepted) {
+        handleAcceptCookie();
+      }
+    }, [analyticsCookieAccepted]);
 
 
     return (
@@ -139,6 +162,10 @@ export default function App({
                 {children}
               </Main>
             </div>
+            {!!!terms ? <WelcomeDialog /> : 
+              session.status === "authenticated" ? 
+                !session.data.user?.name ? <OnboardingDialog /> : 
+                localSchedules !== null ? <MigrationDialog /> : undefined : undefined}
           </Box>
         </>
     )

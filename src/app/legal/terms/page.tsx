@@ -1,6 +1,6 @@
 "use client";
 import { Container, Typography } from "@mui/material";
-import Link from "../lib/Link";
+import Link from "../../lib/Link";
 
 const terms_version = 1;
 
@@ -9,7 +9,7 @@ export default function Page() {
         <Container maxWidth="md">
             <Typography variant="h4">Terms of Service</Typography>
             <Typography variant="subtitle1">Version {terms_version}</Typography>
-            <Typography variant="subtitle2">Last Updated June 11, 2023</Typography>
+            <Typography variant="subtitle2">Last Updated September 23, 2024</Typography>
             <br />
             <Typography variant="h5">Introduction</Typography>
             <Typography>
@@ -22,14 +22,14 @@ export default function Page() {
                 If you create an account, you are responsible for maintaining the confidentiality of your account credentials and are fully responsible for all activities that occur under your account.
                 You agree not to engage in any unlawful, abusive, or unauthorized activities while using the Service.
             </Typography>
-            <Typography variant="h5">Advertisements</Typography>
+            {/*<Typography variant="h5">Advertisements</Typography>
             <Typography>
                 In order to support further development, Tarheel Compass has a few ads in place on certain pages.
                 If you would like to show your appreciation for the service, we ask that you leave any ad blockers off.
                 However, we recognize that it is fully within your right to utilize a form of ad blocker, in which case unpaid UNC related ads may be shown as a backup.
                 These ads do not provide any revenue, nor do they utilize any form of tracking, they were created by student-run clubs and organizations at UNC.
                 If you run a club and are interested in having it advertised here, please reach out to us on Twitter or Instagram @Tarheel Compass.
-            </Typography>
+            </Typography>*/}
             <Typography variant="h5">Intellectual Property</Typography>
             <Typography>
                 All intellectual property rights in the Service, including but not limited to trademarks, copyrights, and patents, are owned by Tarheel Compass.
@@ -37,7 +37,7 @@ export default function Page() {
             </Typography>
             <Typography variant="h5">Privacy and Data</Typography>
             <Typography>
-                Our collection, use, and disclosure of personal information are governed by our <Link href="/privacy">Privacy Policy</Link>. By using the Service, you agree to our Privacy Policy.
+                Our collection, use, and disclosure of personal information are governed by our <Link href="/legal/privacy">Privacy Policy</Link>. By using the Service, you agree to our Privacy Policy.
                 We implement reasonable security measures to protect your data, but we cannot guarantee the absolute security of information transmitted through the Service.
             </Typography>
             <Typography variant="h5">Disclaimer of Warranties</Typography>
