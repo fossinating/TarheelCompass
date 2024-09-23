@@ -122,9 +122,15 @@ dependencies:
   react:
     specifier: ^18.3.1
     version: 18.3.1
+  react-cookie-consent:
+    specifier: ^9.0.0
+    version: 9.0.0(react@18.3.1)
   react-dom:
     specifier: ^18.3.1
     version: 18.3.1(react@18.3.1)
+  react-ga4:
+    specifier: ^2.1.0
+    version: 2.1.0
   react-redux:
     specifier: ^9.1.2
     version: 9.1.2(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1)
@@ -7733,7 +7739,6 @@ packages:
     resolution: {integrity: sha512-Auw9a4AxqWpa9GUfj370BMPzzyncfBABW8Mab7BGWBYDj4Isgq+cDKtx0i6u9jcX9pQDnswsaaOTgTmA5pEjuQ==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
-    deprecated: '"Please update to latest v2.3 or v2.2"'
     requiresBuild: true
     dev: true
     optional: true
@@ -8618,6 +8623,10 @@ packages:
 
   /jose@5.6.2:
     resolution: {integrity: sha512-F1t1/WZJ4JdmCE/XoMYw1dPOW5g8JF0xGm6Ox2fwaCAPlCzt+4Bh0EWP59iQuZNHHauDkCdjx+kCZSh5z/PGow==}
+
+  /js-cookie@2.2.1:
+    resolution: {integrity: sha512-HvdH2LzI/EAZcUwA8+0nKNtWHqS+ZmijLA30RwZA0bo7ToCckjK5MkGhjED9KoRcXO6BaGI3I9UIzSA1FKFPOQ==}
+    dev: false
 
   /js-cookie@3.0.5:
     resolution: {integrity: sha512-cEiJEAEoIbWfCZYKWhVwFuvPX1gETRYPw6LlaTKoxD3s2AkXzkCjnp6h0V77ozyqj0jakteJ4YqDJT830+lVGw==}
@@ -10004,6 +10013,16 @@ packages:
       minimist: 1.2.8
       strip-json-comments: 2.0.1
 
+  /react-cookie-consent@9.0.0(react@18.3.1):
+    resolution: {integrity: sha512-Blyj+m+Zz7SFHYqT18p16EANgnSg2sIyU6Yp3vk83AnOnSW7qnehPkUe4+8+qxztJrNmCH5GP+VHsWzAKVOoZA==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: '>=16'
+    dependencies:
+      js-cookie: 2.2.1
+      react: 18.3.1
+    dev: false
+
   /react-day-picker@8.10.1(date-fns@3.6.0)(react@18.3.1):
     resolution: {integrity: sha512-TMx7fNbhLk15eqcMt+7Z7S2KF7mfTId/XJDjKE8f+IUcFn0l08/kI4FiYTL/0yuOLmEcbR4Fwe3GJf/NiiMnPA==}
     peerDependencies:
@@ -10022,6 +10041,10 @@ packages:
       loose-envify: 1.4.0
       react: 18.3.1
       scheduler: 0.23.2
+    dev: false
+
+  /react-ga4@2.1.0:
+    resolution: {integrity: sha512-ZKS7PGNFqqMd3PJ6+C2Jtz/o1iU9ggiy8Y8nUeksgVuvNISbmrQtJiZNvC/TjDsqD0QlU5Wkgs7i+w9+OjHhhQ==}
     dev: false
 
   /react-is@16.13.1:
