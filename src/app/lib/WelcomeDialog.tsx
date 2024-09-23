@@ -41,6 +41,7 @@ export default function WelcomeDialog() {
             localStorage.setItem("analytics", JSON.stringify(analytics));
             localStorage.setItem("terms", JSON.stringify(true));
             setOpen(false);
+            updateGA();
         } else {
             setTermsError(true);
         }
@@ -85,4 +86,8 @@ export default function WelcomeDialog() {
         </DialogActions>
       </Dialog>
     );
+}
+
+function updateGA() {
+    throw new Error('Function not implemented.');
 }

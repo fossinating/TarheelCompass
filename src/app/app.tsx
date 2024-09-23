@@ -18,7 +18,7 @@ import { usePathname } from 'next/navigation';
 import * as React from 'react';
 import AccountMenu from './lib/AccountMenu';
 import Link from "./lib/Link";
-import { initGA } from './lib/ga-utils';
+import { initGA, updateGAConsent } from './lib/ga-utils';
 import { useLocalStorage } from './localstorage';
 import { useSession } from 'next-auth/react';
 import WelcomeDialog from './lib/WelcomeDialog';
@@ -118,21 +118,12 @@ export default function App({
       setOpen(!open);
     };
 
-    
-    const handleAcceptCookie = () => {
-      if (process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID) {
-        initGA(process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID);
-      }
-    };
     const [terms, _setTerms] = useLocalStorage("terms", false);
-    const [analyticsCookieAccepted, _setAnalyticsCookieAccepted] = useLocalStorage("analytics", false);
     const [localSchedules, _setLocalSchedules] = useLocalStorage("local_schedules", null);
 
     React.useEffect(() => {
-      if (true || analyticsCookieAccepted) {
-        handleAcceptCookie();
-      }
-    }, [analyticsCookieAccepted]);
+      initGA();
+    }, [])
 
 
     return (
