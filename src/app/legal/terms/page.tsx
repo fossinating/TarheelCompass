@@ -1,6 +1,6 @@
 "use client";
 import { Container, Typography } from "@mui/material";
-import Link from "../lib/Link";
+import Link from "../../lib/Link";
 
 const terms_version = 1;
 
