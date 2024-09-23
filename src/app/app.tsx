@@ -129,7 +129,7 @@ export default function App({
     const [localSchedules, _setLocalSchedules] = useLocalStorage("local_schedules", null);
 
     React.useEffect(() => {
-      if (analyticsCookieAccepted) {
+      if (true || analyticsCookieAccepted) {
         handleAcceptCookie();
       }
     }, [analyticsCookieAccepted]);
