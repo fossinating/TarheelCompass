@@ -5,6 +5,7 @@ import { createLogger } from 'redux-logger';
 import { ReduxState } from '.';
 import { addClass, changeCurrentSchedule, createSchedule, deleteSchedule, removeClass, renameSchedule } from './slices/systemSlice';
 import { addClassRemote, createScheduleRemote, deleteScheduleRemote, removeClassRemote, renameScheduleRemote } from '@/server/functions/schedules';
+import ReactGA from "react-ga4";
 
 /*const SYNC_LOCALSTORAGE: Middleware = (store) => (next) => (action) => {
   const result = next(action);
@@ -38,7 +39,7 @@ import { addClassRemote, createScheduleRemote, deleteScheduleRemote, removeClass
 const listenerMiddleware = createListenerMiddleware();
 
 listenerMiddleware.startListening({
-  matcher: isAnyOf(addClass, removeClass, createSchedule),
+  matcher: isAnyOf(addClass, removeClass, createSchedule, deleteSchedule, renameSchedule),
   effect: (action, listenerAPI) => {
     localStorage.setItem(
       "schedules",
@@ -79,6 +80,10 @@ listenerMiddleware.startListening({
         console.error("An error occured while adding class to schedule: " + error);
       }
     }
+    ReactGA.event("addClass", {
+      classNumber: action.payload.classNumber,
+      loggedIn: session !== null,
+    })
   }
 })
 
@@ -93,6 +98,10 @@ listenerMiddleware.startListening({
         console.error("An error occured while removing class from schedule: " + error);
       }
     }
+    ReactGA.event("removeClass", {
+      classNumber: action.payload.classNumber,
+      loggedIn: session !== null,
+    })
   }
 })
 
@@ -108,6 +117,9 @@ listenerMiddleware.startListening({
         console.error("An error occured while creating schedule: " + error);
       }
     }
+    ReactGA.event("createSchedule", {
+      loggedIn: session !== null,
+    })
   }
 })
 
@@ -122,6 +134,9 @@ listenerMiddleware.startListening({
         console.error("An error occured while deleting schedule: " + error);
       }
     }
+    ReactGA.event("deleteSchedule", {
+      loggedIn: session !== null,
+    })
   }
 })
 
@@ -136,6 +151,9 @@ listenerMiddleware.startListening({
         console.error("An error occured while renaming schedule: " + error);
       }
     }
+    ReactGA.event("renameSchedule", {
+      loggedIn: session !== null,
+    })
   }
 })
 

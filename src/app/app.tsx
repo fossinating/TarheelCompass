@@ -18,6 +18,8 @@ import { usePathname } from 'next/navigation';
 import * as React from 'react';
 import AccountMenu from './lib/AccountMenu';
 import Link from "./lib/Link";
+import CookieConsent, { getCookieConsentValue } from "react-cookie-consent";
+import { initGA } from './lib/ga-utils';
 
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -111,6 +113,20 @@ export default function App({
       setOpen(!open);
     };
 
+    
+    const handleAcceptCookie = () => {
+      if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) {
+        initGA(process.env.REACT_APP_GOOGLE_ANALYTICS_ID);
+      }
+    };
+
+    React.useEffect(() => {
+      const isConsent = getCookieConsentValue();
+      if (isConsent === "true") {
+        handleAcceptCookie();
+      }
+    }, []);
+
 
     return (
         <>
@@ -139,6 +155,9 @@ export default function App({
                 {children}
               </Main>
             </div>
+            <CookieConsent enableDeclineButton onAccept={handleAcceptCookie}>
+              This website uses cookies to enhance the user experience.
+            </CookieConsent>
           </Box>
         </>
     )
