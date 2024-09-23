@@ -120,8 +120,8 @@ export default function App({
 
     
     const handleAcceptCookie = () => {
-      if (process.env.REACT_APP_GOOGLE_ANALYTICS_ID) {
-        initGA(process.env.REACT_APP_GOOGLE_ANALYTICS_ID);
+      if (process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID) {
+        initGA(process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID);
       }
     };
     const [terms, _setTerms] = useLocalStorage("terms", false);

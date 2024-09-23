@@ -73,9 +73,9 @@ export default function WelcomeDialog() {
                 <FormControlLabel control={<Checkbox checked={terms} onChange={handleChange} name="terms" />} label={
                     <div>
                         <span>I have read and accept the </span>
-                        <Link href="/terms">terms of use</Link>
+                        <Link href="/legal/terms">terms of use</Link>
                         <span> and </span>
-                        <Link href="/privacy">privacy policy</Link>
+                        <Link href="/legal/privacy">privacy policy</Link>
                     </div>
                     } />
             </FormControl>
