@@ -7,7 +7,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import * as React from 'react';
 
 
-export default function WelcomeDialog() {
+export default function MigrationDialog() {
     const [open, setOpen] = React.useState(true);
 
     const handleClose = (event: object, reason: string) => {
