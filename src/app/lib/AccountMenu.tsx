@@ -10,9 +10,6 @@ import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import { signIn, signOut, useSession } from "next-auth/react";
 import * as React from 'react';
-import { useLocalStorage } from '../localstorage';
-import OnboardingDialog from './OnboardingDialog';
-import WelcomeDialog from './WelcomeDialog';
 
 // source: https://mui.com/material-ui/react-menu/#account-menu
 export default function AccountMenu() {
@@ -26,15 +23,9 @@ export default function AccountMenu() {
   };
   const session = useSession();
   //console.log(session)
-  const [terms, _setTerms] = useLocalStorage("terms", false);
-  const [localSchedules, _setLocalSchedules] = useLocalStorage("local_schedules", null);
 
   return (
     <React.Fragment>
-      {!!!terms ? <WelcomeDialog /> : 
-        session.status === "authenticated" ? 
-          !session.data.user?.name ? <OnboardingDialog /> : 
-          localSchedules !== null ? <WelcomeDialog/> : undefined : undefined}
       <Tooltip title="Account settings">
         <IconButton
           onClick={handleClick}
