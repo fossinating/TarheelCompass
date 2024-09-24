@@ -286,3 +286,4 @@ nextjs/.vscode/settings.json
 *.Identifier
 *.pdf
 .wrangler/
+.dev.vars

@@ -3,6 +3,11 @@ compatibility_flags = ["nodejs_compat"]
 compatibility_date = "2024-07-03"
 pages_build_output_dir = ".vercel/output/static"
 
+[[d1_databases]]
+binding = "DB" # i.e. available in your Worker on env.DB
+database_name = "db-tarheel-compass"
+database_id = "9ee96ee3-b6ed-4d85-b09d-f950e5487aca"
+
 [env.production.vars]
 NEXTAUTH_URL="https://tarheelcompass.com"
 PUBLIC_URL="https://tarheelcompass.com"
