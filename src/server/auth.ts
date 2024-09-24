@@ -7,6 +7,7 @@ import { userTable, accountTable, sessionTable, verificationTokenTable } from '.
 export const runtime = 'edge';
 
 export const { handlers: {GET, POST}, auth } = NextAuth({
+  trustHost: true,
   adapter: DrizzleAdapter(db, {
     usersTable: userTable,
     accountsTable: accountTable,

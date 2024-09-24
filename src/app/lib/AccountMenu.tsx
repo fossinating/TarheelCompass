@@ -35,7 +35,10 @@ export default function AccountMenu() {
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
         >
-          <Avatar sx={{ width: 32, height: 32 }}>{session?.data?.user?.name && session?.data?.user?.name[0] ? session?.data?.user?.name[0].toUpperCase() : null}</Avatar>
+          {session?.data?.user?.image ?
+            <Avatar sx={{ width: 32, height: 32 }} src={session.data.user.image}/> :
+            <Avatar sx={{ width: 32, height: 32 }} >{session?.data?.user?.name && session?.data?.user?.name[0] ? session?.data?.user?.name[0].toUpperCase() : null}</Avatar>
+          }
         </IconButton>
       </Tooltip>
       <Menu
