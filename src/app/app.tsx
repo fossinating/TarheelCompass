@@ -88,7 +88,7 @@ function NavDrawer(props: NavDrawerProps){
       ].map((item, index) => (
         <NavItem item={item} key={item.page}/>
       ))}
-      <Link href="/privacy-policy" className={styles.privacyPolicyLink}>Privacy Policy</Link>
+      <Link href="/legal/privacy" className={styles.privacyPolicyLink}>Privacy Policy</Link>
     </div>
   )
 }
