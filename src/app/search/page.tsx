@@ -8,6 +8,7 @@ import ClassDisplay from "../lib/ClassDisplay";
 import { SectionData, titleCase } from "../lib/Common";
 import { useTerms } from "../lib/Terms";
 import "./Search.css";
+import ReactGA from "react-ga4";
 
 export const runtime = "edge";
 
@@ -69,6 +70,14 @@ export default function Page() {
     return titleCase(first_bit) + last_bit.replaceAll("_", " ");
   }
 
+  const search = () => {
+    loadClasses();
+    ReactGA.event("search", {
+      term: term,
+      code: codeRef.current?.value
+    })
+  }
+
   let class_numbers: Array<number> = [];
 
   return (
@@ -104,7 +113,7 @@ export default function Page() {
           </FormControl>
         </Grid>
         <Grid>
-          <Button onClick={() => loadClasses()} variant="contained" size="medium">Search</Button>
+          <Button onClick={() => search()} variant="contained" size="medium">Search</Button>
         </Grid>
       </Grid>
       <Container id="resultsContainer">

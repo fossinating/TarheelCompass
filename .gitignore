@@ -245,7 +245,7 @@ ssb-collection/*
 *.db
 database.db-journal
 secrets.py
-<<<<<<< Updated upstream
+*.pdf
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
@@ -283,7 +283,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 nextjs/.vscode/settings.json
-=======
+*.Identifier
 *.pdf
->>>>>>> Stashed changes
 .wrangler/
+.dev.vars

@@ -16,6 +16,12 @@ import AccountMenu from './lib/AccountMenu';
 import Link from 'next/link';
       
 import styles from "./app.module.css";
+import { initGA, updateGAConsent } from './lib/ga-utils';
+import { useLocalStorage } from './localstorage';
+import { useSession } from 'next-auth/react';
+import WelcomeDialog from './lib/WelcomeDialog';
+import MigrationDialog from './lib/MigrationDialog';
+import OnboardingDialog from './lib/OnboardingDialog';
 
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -99,10 +105,18 @@ export default function App({
     children: React.ReactNode
   }) {
     const [open, setOpen] = React.useState(false);
+    const session = useSession();
   
     const handleDrawerToggle = () => {
       setOpen(!open);
     };
+
+    const [terms, _setTerms] = useLocalStorage("terms", false);
+    const [localSchedules, _setLocalSchedules] = useLocalStorage("local_schedules", null);
+
+    React.useEffect(() => {
+      initGA();
+    }, [])
 
 
     return (
@@ -132,6 +146,10 @@ export default function App({
                 {children}
               </Main>
             </div>
+            {!!!terms ? <WelcomeDialog /> : 
+              session.status === "authenticated" ? 
+                !session.data.user?.name ? <OnboardingDialog /> : 
+                localSchedules !== null ? <MigrationDialog /> : undefined : undefined}
           </Box>
         </>
     )
