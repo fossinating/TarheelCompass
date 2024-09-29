@@ -1,22 +1,33 @@
-import './index.css';
-//import * as serviceWorkerRegistration from './serviceWorkerRegistration';
-//import reportWebVitals from './reportWebVitals';
-import UserSchedulesPage from './pages/UserSchedulesPage';
+import styles from "./page.module.css";
+import { ReactElement } from "react";
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
+import SearchIcon from '@mui/icons-material/Search';
+import Link from 'next/link'
 
 // Home Page !
 
-export default function Page() {
+function FeaturePanel(props: {title: string, icon: ReactElement, path: string}) {
   return (
-    <UserSchedulesPage />
-  )
+    <Link href={props.path} className={styles.noDecoration}>
+      <div className={styles.featurePanel}>
+        <div className={styles.featureIcon}>{props.icon}</div>
+        <div className={styles.featureTitle}>{props.title}</div>
+      </div>
+    </Link>
+  );
 }
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://cra.link/PWA
-//serviceWorkerRegistration.unregister();
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-//reportWebVitals();
+export default function Page() {
+  return (
+    <div className={styles.pageBox}>
+      <div className={styles.title}>Tarheel Compass</div>
+      <div className={styles.subtitle}>Your one-stop shop for assistance in your Tarheel experience.</div>
+      <div className={styles.featuresContainer}> 
+        <FeaturePanel title="Plan Your Schedule" icon={<CalendarMonthIcon />} path="/schedule" />
+        <FeaturePanel title="Search Classes" icon={<SearchIcon />} path="/search" />
+        <FeaturePanel title="More Coming Soon" icon={<QuestionMarkIcon />} path="/coming-soon"/>
+      </div>
+    </div>
+  )
+}
