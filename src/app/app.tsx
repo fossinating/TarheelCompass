@@ -17,7 +17,8 @@ import Typography from '@mui/material/Typography';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
 import AccountMenu from './lib/AccountMenu';
-import Link from "./lib/Link";
+import Link from 'next/link';
+import styles from "./app.module.css";
 
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -125,11 +126,13 @@ export default function App({
                 edge="start"
                 sx={{ mr: 2 }}
                 >
-                <MenuIcon />
+                  <MenuIcon />
                 </IconButton>
-                <Typography variant="h6" noWrap component="div">
-                Tarheel Compass
-                </Typography>
+                <Link href="/" className={styles.homeLink}>
+                  <Typography variant="h6" noWrap component="div">
+                  Tarheel Compass
+                  </Typography>
+                </Link>
                 <AccountMenu />
               </Toolbar>
             </AppBar>
