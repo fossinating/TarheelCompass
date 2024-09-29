@@ -41,6 +41,7 @@ export default function WelcomeDialog() {
             localStorage.setItem("analytics", JSON.stringify(analytics));
             localStorage.setItem("terms", JSON.stringify(true));
             setOpen(false);
+            updateGA();
         } else {
             setTermsError(true);
         }
@@ -73,9 +74,9 @@ export default function WelcomeDialog() {
                 <FormControlLabel control={<Checkbox checked={terms} onChange={handleChange} name="terms" />} label={
                     <div>
                         <span>I have read and accept the </span>
-                        <Link href="/terms">terms of use</Link>
+                        <Link href="/legal/terms">terms of use</Link>
                         <span> and </span>
-                        <Link href="/privacy">privacy policy</Link>
+                        <Link href="/legal/privacy">privacy policy</Link>
                     </div>
                     } />
             </FormControl>
@@ -85,4 +86,8 @@ export default function WelcomeDialog() {
         </DialogActions>
       </Dialog>
     );
+}
+
+function updateGA() {
+    throw new Error('Function not implemented.');
 }

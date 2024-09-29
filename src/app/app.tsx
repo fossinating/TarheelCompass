@@ -7,10 +7,6 @@ import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import IconButton from '@mui/material/IconButton';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import { createTheme, styled } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -18,7 +14,14 @@ import { usePathname } from 'next/navigation';
 import * as React from 'react';
 import AccountMenu from './lib/AccountMenu';
 import Link from 'next/link';
+      
 import styles from "./app.module.css";
+import { initGA, updateGAConsent } from './lib/ga-utils';
+import { useLocalStorage } from './localstorage';
+import { useSession } from 'next-auth/react';
+import WelcomeDialog from './lib/WelcomeDialog';
+import MigrationDialog from './lib/MigrationDialog';
+import OnboardingDialog from './lib/OnboardingDialog';
 
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -52,14 +55,9 @@ function NavItem(props: {item: NavData}) {
   const pathname = usePathname();
 
   return (
-    <Link href={props.item.page} className={pathname === (props.item.page) ? "current" : undefined}>
-      <ListItem key={props.item.label}>
-        <ListItemIcon>
-          {props.item.element}
-        </ListItemIcon>
-        <ListItemText primary={props.item.label}>
-        </ListItemText>
-      </ListItem>
+    <Link href={props.item.page} className={styles.navItem + " " + (pathname === (props.item.page) ? styles.current : "")}>
+      <div className={styles.navItemIcon}>{props.item.element}</div>
+      <div className={styles.navItemLabel}>{props.item.label}</div>
     </Link>
     )}
 
@@ -83,14 +81,14 @@ interface NavDrawerProps{
 
 function NavDrawer(props: NavDrawerProps){
   return (
-    <div id="navDrawer" className={props.open ? 'open' : undefined}>
-      <List>
+    <div className={styles.navDrawer + " " + (props.open ? styles.open : '')}>
       {[
         new NavData("Schedule", <CalendarViewWeekIcon />, "/"),
         new NavData("Search", <SearchIcon />, "/search")
       ].map((item, index) => (
         <NavItem item={item} key={item.page}/>
-      ))}</List>
+      ))}
+      <Link href="/legal/privacy" className={styles.privacyPolicyLink}>Privacy Policy</Link>
     </div>
   )
 }
@@ -107,10 +105,18 @@ export default function App({
     children: React.ReactNode
   }) {
     const [open, setOpen] = React.useState(false);
+    const session = useSession();
   
     const handleDrawerToggle = () => {
       setOpen(!open);
     };
+
+    const [terms, _setTerms] = useLocalStorage("terms", false);
+    const [localSchedules, _setLocalSchedules] = useLocalStorage("local_schedules", null);
+
+    React.useEffect(() => {
+      initGA();
+    }, [])
 
 
     return (
@@ -142,6 +148,10 @@ export default function App({
                 {children}
               </Main>
             </div>
+            {!!!terms ? <WelcomeDialog /> : 
+              session.status === "authenticated" ? 
+                !session.data.user?.name ? <OnboardingDialog /> : 
+                localSchedules !== null ? <MigrationDialog /> : undefined : undefined}
           </Box>
         </>
     )
