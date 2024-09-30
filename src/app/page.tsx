@@ -7,15 +7,23 @@ import Link from 'next/link'
 
 // Home Page !
 
-function FeaturePanel(props: {title: string, icon: ReactElement, path: string}) {
-  return (
-    <Link href={props.path} className={styles.noDecoration}>
-      <div className={styles.featurePanel}>
-        <div className={styles.featureIcon}>{props.icon}</div>
-        <div className={styles.featureTitle}>{props.title}</div>
-      </div>
-    </Link>
-  );
+function FeaturePanel(props: {title: string, icon: ReactElement, path?: string|null}) {
+  let inside = (
+    <div className={styles.featurePanel}>
+      <div className={styles.featureIcon}>{props.icon}</div>
+      <div className={styles.featureTitle}>{props.title}</div>
+    </div>)
+
+  
+  if (props.path) {
+    return (
+      <Link href={props.path} className={styles.noDecoration}>
+        { inside }
+      </Link>
+    );
+  } else {
+    return inside;
+  }
 }
 
 export default function Page() {
@@ -26,7 +34,7 @@ export default function Page() {
       <div className={styles.featuresContainer}> 
         <FeaturePanel title="Plan Your Schedule" icon={<CalendarMonthIcon />} path="/schedule" />
         <FeaturePanel title="Search Classes" icon={<SearchIcon />} path="/search" />
-        <FeaturePanel title="More Coming Soon" icon={<QuestionMarkIcon />} path="/coming-soon"/>
+        <FeaturePanel title="More Coming Soon" icon={<QuestionMarkIcon />}/>
       </div>
     </div>
   )
