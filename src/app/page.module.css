@@ -1,0 +1,88 @@
+.pageBox {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--height-0-background);
+
+    justify-content: center;
+    align-items: center;
+    padding: 3em;
+
+    min-height: 100%;
+}
+
+.title {
+    font-size: 3em;
+}
+
+.subtitle {
+    font-size: 2em;
+}
+
+/* TODO: Modify this to have desktop view */
+.featuresContainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    justify-content: center;
+    margin-top: 3em;
+}
+
+.featurePanel {
+    width: min(350px, 70vw);
+    aspect-ratio: 1/1;
+    background-color: var(--height-1-background);
+    box-shadow: var(--height-1-boxshadow);
+
+    display: grid;
+    grid-template-rows: 4fr 1fr;
+
+    margin: 1em;
+
+    color: var(--primary-text-color);
+    text-decoration: none;
+    
+    font-size: 2em;
+
+    border-radius: 10px;
+    padding: 1em;
+
+    transition: transform 0.3s ease-in-out,
+                background-color 0.3s ease-in-out;
+}
+
+.featureIcon {
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-content: center;
+}
+
+.featureIcon > svg {
+    height: 70%;
+    width: unset;
+}
+
+.featureIcon > svg > path {
+    font-size: 4em;
+}
+
+.featureTitle {
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+}
+
+@media not (prefers-reduced-motion) {
+    .featurePanel:hover, .featurePanel:focus {
+        transform: scale(1.03);
+        background-color: var(--height-2-background);
+    }
+}
+
+.noDecoration {
+    text-decoration: none;
+}
