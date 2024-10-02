@@ -19,6 +19,7 @@ function NoSchedulesPage() {
 
   const createScheduleClosed = () => {
     // It automatically paths to the new schedule, so we don't need to do anything here
+    setCreateScheduleVisible(false);
   }
 
   return (
