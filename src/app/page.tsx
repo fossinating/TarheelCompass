@@ -9,20 +9,24 @@ import Link from 'next/link'
 
 function FeaturePanel(props: {title: string, icon: ReactElement, path?: string|null}) {
   let inside = (
-    <div className={styles.featurePanel}>
+    <>
       <div className={styles.featureIcon}>{props.icon}</div>
       <div className={styles.featureTitle}>{props.title}</div>
-    </div>)
+    </>)
 
   
   if (props.path) {
     return (
-      <Link href={props.path} className={styles.noDecoration}>
+      <Link href={props.path} className={styles.noDecoration+ " " + styles.featurePanel}>
         { inside }
       </Link>
     );
   } else {
-    return inside;
+    return (
+      <div className={styles.featurePanel}>
+        {inside}
+      </div>
+    )
   }
 }
 
@@ -30,9 +34,9 @@ export default function Page() {
   return (
     <div className={styles.pageBox}>
       <div className={styles.title}>Tarheel Compass</div>
-      <div className={styles.subtitle}>Your one-stop shop for assistance in your Tarheel experience.</div>
+      <div className={styles.subtitle}>Your guide to a simpler class registration</div>
       <div className={styles.featuresContainer}> 
-        <FeaturePanel title="Plan Your Schedule" icon={<CalendarMonthIcon />} path="/schedule" />
+        <FeaturePanel title="Schedule" icon={<CalendarMonthIcon />} path="/schedule" />
         <FeaturePanel title="Search Classes" icon={<SearchIcon />} path="/search" />
         <FeaturePanel title="More Coming Soon" icon={<QuestionMarkIcon />}/>
       </div>

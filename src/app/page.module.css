@@ -12,10 +12,12 @@
 
 .title {
     font-size: 3em;
+    text-align: center;
 }
 
 .subtitle {
     font-size: 2em;
+    text-align: center;
 }
 
 /* TODO: Modify this to have desktop view */
@@ -25,7 +27,7 @@
     flex-wrap: wrap;
 
     justify-content: center;
-    margin-top: 3em;
+    margin-top: 2em;
 }
 
 .featurePanel {
@@ -35,14 +37,12 @@
     box-shadow: var(--height-1-boxshadow);
 
     display: grid;
-    grid-template-rows: 4fr 1fr;
+    grid-template-rows: 70% 30%;
 
     margin: 1em;
 
     color: var(--primary-text-color);
     text-decoration: none;
-    
-    font-size: 2em;
 
     border-radius: 10px;
     padding: 1em;
@@ -57,15 +57,14 @@
 
     justify-content: center;
     align-content: center;
+
+    height: 100%;
+    width: 100%;
 }
 
 .featureIcon > svg {
-    height: 70%;
+    height: 100%;
     width: unset;
-}
-
-.featureIcon > svg > path {
-    font-size: 4em;
 }
 
 .featureTitle {
@@ -74,12 +73,22 @@
 
     justify-content: center;
     align-items: center;
+
+    text-align: center;
+
+    font-size: 4cqh;
 }
 
 @media not (prefers-reduced-motion) {
     .featurePanel:hover, .featurePanel:focus {
         transform: scale(1.03);
         background-color: var(--height-2-background);
+    }
+}
+
+@media (max-width: 500px) {
+    .title {
+        display: none;
     }
 }
 
