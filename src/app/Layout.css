@@ -31,6 +31,9 @@ html, body, #root, #layoutContainer {
     --height-2-background: rgb(112, 112, 112);
     --height-3-background: rgb(92, 92, 92);
     --height-1-boxshadow: 0px 0px 5px 0px #000000;
+    --primary-action-background: rgb(91, 183, 226);
+    --primary-action-background-hover: rgb(72, 151, 187);
+    --primary-action-color: black;
 }
 
 * {

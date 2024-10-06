@@ -1,44 +1,24 @@
+/* eslint-disable @next/next/no-img-element */
 import styles from "./page.module.css";
 import { ReactElement } from "react";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import SearchIcon from '@mui/icons-material/Search';
 import Link from 'next/link'
+import Image from "next/image";
 
 // Home Page !
-
-function FeaturePanel(props: {title: string, icon: ReactElement, path?: string|null}) {
-  let inside = (
-    <>
-      <div className={styles.featureIcon}>{props.icon}</div>
-      <div className={styles.featureTitle}>{props.title}</div>
-    </>)
-
-  
-  if (props.path) {
-    return (
-      <Link href={props.path} className={styles.noDecoration+ " " + styles.featurePanel}>
-        { inside }
-      </Link>
-    );
-  } else {
-    return (
-      <div className={styles.featurePanel}>
-        {inside}
-      </div>
-    )
-  }
-}
 
 export default function Page() {
   return (
     <div className={styles.pageBox}>
-      <div className={styles.title}>Tarheel Compass</div>
-      <div className={styles.subtitle}>Your guide to a simpler class registration</div>
-      <div className={styles.featuresContainer}> 
-        <FeaturePanel title="Schedule" icon={<CalendarMonthIcon />} path="/schedule" />
-        <FeaturePanel title="Search Classes" icon={<SearchIcon />} path="/search" />
-        <FeaturePanel title="More Coming Soon" icon={<QuestionMarkIcon />}/>
+      <div className={styles.textSection}>
+        <div className={styles.line_one}>Your guide to</div>
+        <div className={styles.line_two}>a simpler class registration</div>
+        <Link href={"/schedule"} className={styles.cta_button}>Get Started</Link>
+      </div>
+      <div className={styles.hero_img}>
+        <img src="/hero_image.webp" alt="Picture of an example schedule"/>
       </div>
     </div>
   )
