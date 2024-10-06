@@ -132,11 +132,13 @@ export default function App({
                 edge="start"
                 sx={{ mr: 2 }}
                 >
-                <MenuIcon />
+                  <MenuIcon />
                 </IconButton>
-                <Typography variant="h6" noWrap component="div">
-                Tarheel Compass
-                </Typography>
+                <Link href="/" className={styles.homeLink}>
+                  <Typography variant="h6" noWrap component="div">
+                  Tarheel Compass
+                  </Typography>
+                </Link>
                 <AccountMenu />
               </Toolbar>
             </AppBar>
