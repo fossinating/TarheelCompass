@@ -12,7 +12,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import * as React from 'react';
 
 // source: https://mui.com/material-ui/react-menu/#account-menu
-export default function AccountMenu() {
+export default function AccountMenu(props: {className: string|undefined}) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -26,7 +26,7 @@ export default function AccountMenu() {
 
   return (
     <React.Fragment>
-      <Tooltip title="Account settings">
+      <Tooltip className={props.className} title="Account settings">
         <IconButton
           onClick={handleClick}
           size="small"

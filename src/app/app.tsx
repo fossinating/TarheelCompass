@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client'
 
 import CalendarViewWeekIcon from '@mui/icons-material/CalendarViewWeek';
@@ -121,36 +122,32 @@ export default function App({
 
     return (
         <>
-        <CssBaseline />
-          <Box id="layoutContainer">
-            <AppBar id="headerBar" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-              <Toolbar>
-                <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleDrawerToggle}
-                edge="start"
-                sx={{ mr: 2 }}
-                >
-                <MenuIcon />
-                </IconButton>
-                <Typography variant="h6" noWrap component="div">
-                Tarheel Compass
-                </Typography>
-                <AccountMenu />
-              </Toolbar>
-            </AppBar>
-            <NavDrawer open={open} />
-            <div id="main-wrapper">
-              <Main id="main-container" open={open}>
-                {children}
-              </Main>
+          <CssBaseline />
+          <div className={styles.mainContainer}>
+            <div className={styles.topBar}>
+              <div className={styles.topBarLayer}>
+                <Link href="/" className={styles.homeLink}>
+                  {/* eslint-disable-next-line jsx-a11y/alt-text*/}
+                  <div className={styles.homeIcon}><img src="/favicon.ico"/></div>
+                  <div className={styles.homeText}>
+                    Tarheel Compass
+                  </div>
+                </Link>
+                <AccountMenu className={styles.accountMenu} />
+              </div>
+              <div className={styles.navContainer}>
+
+              </div>
             </div>
-            {!!!terms ? <WelcomeDialog /> : 
-              session.status === "authenticated" ? 
-                !session.data.user?.name ? <OnboardingDialog /> : 
-                localSchedules !== null ? <MigrationDialog /> : undefined : undefined}
-          </Box>
+            <div className={styles.contentContainer}>
+              {children}
+            </div>
+          </div>
+          
+          {!!!terms ? <WelcomeDialog /> : 
+            session.status === "authenticated" ? 
+              !session.data.user?.name ? <OnboardingDialog /> : 
+              localSchedules !== null ? <MigrationDialog /> : undefined : undefined}
         </>
     )
 }

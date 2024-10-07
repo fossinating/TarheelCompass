@@ -1,87 +1,70 @@
-.navDrawer {
-  grid-row: 2 / 3;
-  grid-column: 1 / 2;
-  /*width: 0;*/
-  background-color: #ccc;
-  transition: margin-left .5s ease-in-out;
-  margin-left: -16em;
-  width: 15em;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2),0px 4px 5px 0px rgba(0,0,0,0.14),0px 1px 10px 0px rgba(0,0,0,0.12);
-}
-
-.navDrawer.open {
-  margin-left: 0;
-}
-
-.navItem.current {
-  background-color: rgb(182, 182, 182);
-}
-
-.navItem:hover {
-  background-color: #a8a8a8;
-}
-
-.navItem {
-  display: grid;
-  grid-template-columns: 3.5em 1fr;
-  height: 3.5em;
-  width: 100%;
-  padding: .5em;
-  text-decoration: none;
-  color: var(--primary-text-color);
-  transition: background-color .2s ease-in-out;
-}
-
-.navItemIcon {
-  display: flex;
-  flex-direction: column;
+.mainContainer {
+  height: 100vh;
+  width: 100vw;
   
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  grid-template-rows: 4rem 1fr;
 }
 
-.navItemLabel {
+.topBar {
+  background-color: var(--height-2-background);
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+.topBarLayer {
+  width: 100vw;
+  height: 4rem;
+
+  grid-column: 1/2;
+  grid-row: 1/2;
+
   display: flex;
-  flex-direction: column;
-  align-items: start;
-  justify-content: center;
+  flex-direction: row;
+
+  padding: .5em;
 }
 
-.privacyPolicyLink {
-  margin-top: auto;
+.homeLink {
+  margin-right: auto;
+  display: flex;
+  flex-direction: row;
+
   text-decoration: none;
-  color: var(--primary-text-color);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
+.homeText {
+  text-decoration: none;
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+  font-size: 1.5em;
+  color: var(--primary-text);
+  margin-left: .5em;
+
+  text-align: center;
+
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.accountMenu {
+  margin-left: auto;
+  aspect-ratio: 1/1;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+
+
+.navContainer {
+  width: min-content;
+  height: 4rem;
+
+  grid-column: 1/2;
+  grid-row: 1/2;
+
+  display: flex;
+  flex-direction: row;
+
+  padding: .5em;
 }
