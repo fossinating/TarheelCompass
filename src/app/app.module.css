@@ -12,6 +12,7 @@
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
+  box-shadow: 0 0px 5px 5px rgba(0, 0, 0, 0.699);
 }
 
 .topBarLayer {
