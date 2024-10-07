@@ -1,22 +1,25 @@
-import './index.css';
-//import * as serviceWorkerRegistration from './serviceWorkerRegistration';
-//import reportWebVitals from './reportWebVitals';
-import UserSchedulesPage from './pages/UserSchedulesPage';
+/* eslint-disable @next/next/no-img-element */
+import styles from "./page.module.css";
+import { ReactElement } from "react";
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
+import SearchIcon from '@mui/icons-material/Search';
+import Link from 'next/link'
+import Image from "next/image";
 
 // Home Page !
 
 export default function Page() {
   return (
-    <UserSchedulesPage />
+    <div className={styles.pageBox}>
+      <div className={styles.textSection}>
+        <div className={styles.line_one}>Your guide to</div>
+        <div className={styles.line_two}>a simpler class registration</div>
+        <Link href={"/schedule"} className={styles.cta_button}>Get Started</Link>
+      </div>
+      <div className={styles.hero_img}>
+        <img src="/hero_image.webp" alt="Picture of an example schedule"/>
+      </div>
+    </div>
   )
 }
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://cra.link/PWA
-//serviceWorkerRegistration.unregister();
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-//reportWebVitals();
