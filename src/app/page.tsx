@@ -11,15 +11,19 @@ import Image from "next/image";
 
 export default function Page() {
   return (
-    <div className={styles.pageBox}>
-      <div className={styles.textSection}>
-        <div className={styles.line_one}>Your guide to</div>
-        <div className={styles.line_two}>a simpler class registration</div>
-        <Link href={"/schedule"} className={styles.cta_button}>Get Started</Link>
+      <div className={styles.pageBox}>
+        {/* eslint-disable-next-line jsx-a11y/alt-text*/}
+        <img className={styles.backgroundImage} src={"/backgrounds/IMG_3213.webp"}/>
+        <div className={styles.pageContent}>
+          <div className={styles.textSection}>
+            <div className={styles.line_one}>Your guide to</div>
+            <div className={styles.line_two}>a simpler class registration</div>
+            <Link href={"/schedule"} className={styles.cta_button}>Get Started</Link>
+          </div>
+          <div className={styles.hero_img}>
+            <img src="/hero_image.webp" alt="Picture of an example schedule"/>
+          </div>
+        </div>
       </div>
-      <div className={styles.hero_img}>
-        <img src="/hero_image.webp" alt="Picture of an example schedule"/>
-      </div>
-    </div>
   )
 }

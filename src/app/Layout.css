@@ -34,8 +34,6 @@ html, body, #root, #layoutContainer {
     --primary-action-background: rgb(91, 183, 226);
     --primary-action-background-hover: rgb(72, 151, 187);
     --primary-action-color: black;
-
-    --primary-text: rgba(0, 0, 0, 0.808);
 }
 
 * {

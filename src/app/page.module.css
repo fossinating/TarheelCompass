@@ -1,5 +1,24 @@
 .pageBox {
-    background-color: var(--height-0-background);
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template: 1fr / 1fr;
+}
+
+.pageContent, .backgroundImage {
+    grid-column: 1/2;
+    grid-row: 1/2;
+    width: 100%;
+    height: 100%;
+}
+
+.backgroundImage {
+    overflow: clip;
+}
+
+.pageContent {
+    background-color: #4b9cd38e;
+    backdrop-filter: grayscale(1) blur(2px);
 
     justify-content: center;
     align-items: center;
@@ -11,6 +30,11 @@
     grid-template-columns: 3fr 2fr;
 }
 
+.backgroundImage {
+    width: 100vw;
+    object-fit: cover;
+}
+
 .textSection {
     display: flex;
     flex-direction: column;
@@ -20,6 +44,7 @@
 
 .line_one, .line_two {
     width: min(35rem, 100%);
+    color: var(--primary-text-color);
 }
 
 .line_one {
