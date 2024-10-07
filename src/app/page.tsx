@@ -16,8 +16,10 @@ export default function Page() {
         <img className={styles.backgroundImage} src={"/backgrounds/IMG_3213.webp"}/>
         <div className={styles.pageContent}>
           <div className={styles.textSection}>
-            <div className={styles.line_one}>Your guide to</div>
-            <div className={styles.line_two}>a simpler class registration</div>
+            <div className={styles.primaryText}>
+              <div className={styles.line_one}>Your guide to</div>
+              <div className={styles.line_two}>a simpler class registration</div>
+            </div>
             <Link href={"/schedule"} className={styles.cta_button}>Get Started</Link>
           </div>
           <div className={styles.hero_img}>
